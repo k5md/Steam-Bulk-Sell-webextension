@@ -1,0 +1,11 @@
+---
+
+language: node_js
+node_js: 
+  - stable
+
+sudo: false
+
+script:
+- make install
+- make build-prod
