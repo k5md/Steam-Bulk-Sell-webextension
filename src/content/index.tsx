@@ -19,6 +19,12 @@ async function checkElement(selector: string): Promise<Element> {
 
 const LOG_WRAPPER = '#inventory_logos';
 const ITEM_HOLDER = ':scope #inventories .inventory_page .itemHolder';
+declare let g_ActiveInventory: any;
+declare let g_strCountryCode: any;
+declare let g_sessionID: any;
+declare let GetMarketHashName: any;
+const INVENTORY_URL = 'https://steamcommunity.com/inventory';
+const SELL_URL = 'https://steamcommunity.com/market/sellitem';
 
 interface SteamBulkSell {
   logger: any;
@@ -120,6 +126,59 @@ class SteamBulkSell {
 
       observer.observe(inventory, { childList: true, subtree: true });
     });
+
+    const mountSellButton = () => {
+      const parseItemData = (id: string) => {
+        const [ app, context, asset ] = id.split('_');
+        return { app, context, asset };
+      }
+
+      const getInventory = () => {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        const { appid, contextid, m_steamid, m_cItems } = g_ActiveInventory;
+        const url = `${INVENTORY_URL}/${m_steamid}/${appid}/${contextid}?l=${g_strCountryCode}&count=${m_cItems}`;
+        
+        const requestConfig: RequestInit = {
+          method: 'GET',
+          cache: 'no-cache',
+          mode: 'same-origin',
+          credentials: 'same-origin',
+        };
+
+        return fetch(url, requestConfig);
+      };
+
+      const getPrice = () => {
+
+      };
+
+      const sellItem = (item: any) => {
+        const { appid, contextid, assetid, price } = item;
+        
+        const requestData = {
+          sessionid: g_sessionID,
+          appid,
+          contextid,
+          assetid,
+          amount: 1,
+          price,
+        };
+        const requestConfig: RequestInit = {
+          method: 'POST',
+          cache: 'no-cache',
+          mode: 'cors',
+          body: JSON.stringify(requestData),
+        };
+        fetch(SELL_URL, requestConfig)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('Success:', data);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+      };
+    };
   }
 }
 
