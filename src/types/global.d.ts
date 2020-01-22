@@ -6,4 +6,12 @@ declare module "*.scss" {
   export = content;
 }
 
+// for steam content script
+export {}
+declare global {
+  interface Window {
+    wrappedJSObject: any;
+  }
+}
+
 declare const PRODUCTION: boolean;

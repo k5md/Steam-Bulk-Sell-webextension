@@ -19,20 +19,65 @@ async function checkElement(selector: string): Promise<Element> {
 
 const LOG_WRAPPER = '#inventory_logos';
 const ITEM_HOLDER = ':scope #inventories .inventory_page .itemHolder';
-declare let g_ActiveInventory: any;
-declare let g_strCountryCode: any;
-declare let g_sessionID: any;
-declare let GetMarketHashName: any;
 const INVENTORY_URL = 'https://steamcommunity.com/inventory';
 const SELL_URL = 'https://steamcommunity.com/market/sellitem';
 
 interface SteamBulkSell {
   logger: any;
+  selectedItems: any;
 }
+
+const hideAppLogo = () => {
+  const appLogo: HTMLElement = document.querySelector('#inventory_applogo');
+  appLogo.style.display = 'none';
+  const inventoryLogos: HTMLElement = document.querySelector(LOG_WRAPPER);
+  inventoryLogos.style.height = 'unset';
+};
+
+const parseItemData = (id: string) => {
+  const [ app, context, asset ] = id.split('_');
+  return { app, context, asset };
+}
+
+declare let XPCNativeWrapper: any;
+
+const getInventory = (): any => {
+  const g_strCountryCode = XPCNativeWrapper(window.wrappedJSObject.g_strCountryCode);
+  const g_ActiveInventory =  XPCNativeWrapper(window.wrappedJSObject.g_ActiveInventory);
+  const { appid, contextid, m_steamid, m_cItems } = g_ActiveInventory;
+  
+  const url = `${INVENTORY_URL}/${m_steamid}/${appid}/${contextid}?l=${g_strCountryCode}&count=${m_cItems}`;
+  
+  const requestConfig: RequestInit = {
+    method: 'GET',
+    // cache: 'no-cache',
+    mode: 'same-origin',
+    credentials: 'same-origin',
+  };
+
+  return fetch(url, requestConfig).then(response => response.json());
+};
+
+const getPrice = () => {
+
+};
 
 class SteamBulkSell {
   constructor() {
     this.logger = console;
+    this.selectedItems = {};
+  }
+
+  async toggleItem(itemId: string, selected: boolean): Promise<any> {
+    const itemData = parseItemData(itemId);
+    const response = await getInventory();
+    console.log(response);
+    console.log(itemData);
+    const { assets, descriptions, success } = response;
+
+
+    this.selectedItems[itemId] = selected ? itemData : null;
+    this.logger.log(JSON.stringify(this.selectedItems, null, '  '), 'Checked items');
   }
 
   mount(): void {
@@ -44,10 +89,7 @@ class SteamBulkSell {
       const mountLogger = (container: HTMLElement): HTMLElement => {
         const log = document.createElement('div');
         const logStyles = {
-          'margin-left': '241px',
-          'height': '69px',
-          'top': '-73px',
-          'position': 'relative',
+          'height': '70px',
           'overflow-y': 'scroll',
           'word-wrap': 'anywhere',
         };
@@ -73,6 +115,13 @@ class SteamBulkSell {
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = false;
+      checkbox.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        const itemElement = target.previousSibling as HTMLElement;
+        const itemId = itemElement.id;
+        
+        this.toggleItem(itemId, target.checked)
+      };
       const checkboxStyles = {
         'position': 'absolute',
         'top': '0px',
@@ -103,58 +152,19 @@ class SteamBulkSell {
       });
     };
 
-    checkElement(LOG_WRAPPER).then(() => {
-      const logger = createLogger();
-      this.logger = logger;
-      this.logger.log('Logger', 'Mount');
-    });
-    
-    checkElement(ITEM_HOLDER).then(() => {
-      // when at least one item holder is loaded start mounting checkboxes
-      const { items } = getItems();
-      mountCheckboxes(items);
-
-      // additional itemholders are loaded asynchronously, so watch inventory container
-      // and mount checkboxes on change
-      // TODO: optimize this bullshit
-      // TODO: refactor
-      const observer = new MutationObserver(() => {
-        const { items } = getItems();
-        mountCheckboxes(items);
-      });
-      const { inventory } = getItems();
-
-      observer.observe(inventory, { childList: true, subtree: true });
-    });
-
-    const mountSellButton = () => {
-      const parseItemData = (id: string) => {
-        const [ app, context, asset ] = id.split('_');
-        return { app, context, asset };
-      }
-
-      const getInventory = () => {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        const { appid, contextid, m_steamid, m_cItems } = g_ActiveInventory;
-        const url = `${INVENTORY_URL}/${m_steamid}/${appid}/${contextid}?l=${g_strCountryCode}&count=${m_cItems}`;
-        
-        const requestConfig: RequestInit = {
-          method: 'GET',
-          cache: 'no-cache',
-          mode: 'same-origin',
-          credentials: 'same-origin',
-        };
-
-        return fetch(url, requestConfig);
+    const createControls = (): any => {
+      const getControlsWrapper = (): HTMLElement => {
+        return document.querySelector(LOG_WRAPPER);
       };
 
-      const getPrice = () => {
 
-      };
+
+
 
       const sellItem = (item: any) => {
         const { appid, contextid, assetid, price } = item;
-        
+        const g_sessionID = XPCNativeWrapper(window.wrappedJSObject.g_sessionID);
+
         const requestData = {
           sessionid: g_sessionID,
           appid,
@@ -178,7 +188,63 @@ class SteamBulkSell {
             console.error('Error:', error);
           });
       };
+
+      const sellItems = () => {
+
+      };
+
+      const mountControls = (container: HTMLElement): HTMLElement => {
+        const sellButton = document.createElement('input');
+        const sellButtonStyles = {
+          'margin-top': '10px',
+        };
+        sellButton.type = 'button';
+        sellButton.value = 'Sell selected items';
+        sellButton.className = 'btn_darkblue_white_innerfade btn_medium new_trade_offer_btn';
+        sellButton.onclick = sellItems;
+        applyStyles(sellButton, sellButtonStyles);
+  
+        container.appendChild(sellButton);      
+        return sellButton;
+      };
+
+      const wrapper = getControlsWrapper();
+      const element = mountControls(wrapper);
+      const sell = (): void => {};
+
+      return { wrapper, element, sell };
     };
+
+    checkElement(LOG_WRAPPER).then(() => {
+      hideAppLogo();
+
+      const logger = createLogger();
+      this.logger = logger;
+      this.logger.log('Logger', 'Mount');
+
+      const controls = createControls();
+      this.logger.log('Controls', 'Mount');
+    });
+    
+    checkElement(ITEM_HOLDER).then(() => {
+      // when at least one item holder is loaded start mounting checkboxes
+      const { items } = getItems();
+      mountCheckboxes(items);
+
+      // additional itemholders are loaded asynchronously, so watch inventory container
+      // and mount checkboxes on change
+      // TODO: optimize this bullshit
+      // TODO: refactor
+      const observer = new MutationObserver(() => {
+        const { items } = getItems();
+        mountCheckboxes(items);
+      });
+      const { inventory } = getItems();
+
+      observer.observe(inventory, { childList: true, subtree: true });
+    });
+
+
   }
 }
 
