@@ -14,8 +14,8 @@ module.exports = {
     path: DIST_DIR,
   },
   entry: {
-    content: './src/content/index.tsx',
-    popup: './src/popup/index.tsx',
+    content: './src/content/index.ts',
+    popup: './src/popup/index.ts',
   },
   resolve: {
     modules: [SRC_DIR, 'node_modules'],

@@ -1,32 +1,12 @@
-const applyStyles = (element: HTMLElement, styles: object): void => 
-  Object.entries(styles).forEach(([property, value]) => element.style[property] = value);
-
-function rafAsync(): Promise<any>{
-  return new Promise(resolve => {
-
-    window.requestAnimationFrame(resolve); //faster than set time out
-  });
-}
-
-async function checkElement(selector: string): Promise<Element> {
-  const querySelector = document.querySelector(selector);
-  console.log(selector, querySelector);
-  while (querySelector === null) {
-      await rafAsync()
-  }
-  return querySelector;
-}  
-
+import { checkElement, applyStyles, applyProperties, getOriginalWindow } from '../utils';
+import { getInventory, getPrice, sellItem } from './API';
 const LOG_WRAPPER = '#inventory_logos';
 const ITEM_HOLDER = ':scope #inventories .inventory_page .itemHolder';
-const INVENTORY_URL = 'https://steamcommunity.com/inventory';
-const SELL_URL = 'https://steamcommunity.com/market/sellitem';
-const PRICE_URL = 'https://steamcommunity.com/market/priceoverview';
 
-interface SteamBulkSell {
-  logger: any;
-  selectedItems: any;
-}
+
+const EXTENSION_NAME = 'steambulksell';
+const pageWindow = getOriginalWindow(window);
+
 
 const hideAppLogo = () => {
   const appLogo: HTMLElement = document.querySelector('#inventory_applogo');
@@ -40,43 +20,48 @@ const parseItemData = (id: string) => {
   return { app, context, asset };
 }
 
-declare let XPCNativeWrapper: any;
 
-const getInventory = (): any => {
-  const g_strCountryCode = XPCNativeWrapper(window.wrappedJSObject.g_strCountryCode);
-  const g_ActiveInventory =  XPCNativeWrapper(window.wrappedJSObject.g_ActiveInventory);
-  const { appid, contextid, m_steamid, m_cItems } = g_ActiveInventory;
-  
-  const url = `${INVENTORY_URL}/${m_steamid}/${appid}/${contextid}?l=${g_strCountryCode}&count=${m_cItems}`;
-  
-  const requestConfig: RequestInit = {
-    method: 'GET',
-    // cache: 'no-cache',
-    mode: 'same-origin',
-    credentials: 'same-origin',
-  };
 
-  return fetch(url, requestConfig).then(response => response.json());
+const sellItems = () => {
+
 };
 
-const getPrice = (country, currencyId, appId, marketHashName) => {
-  const url = `${PRICE_URL}/?country=${country}&currency=${currencyId}&appid=${appId}&market_hash_name=${marketHashName}`;
-  const requestConfig: RequestInit = {
-    "credentials": "include",
-    "mode": "cors"
-  };
-  return fetch(url, requestConfig).then(response => response.json());
+const hasSellableItems = (item: HTMLElement): boolean => item.hasChildNodes()
+  && item.style.display !== 'none'
+  && !item.classList.contains('disabled')
+  && !item.getElementsByTagName('input').length;
+
+const getItems = (): any => {
+  const items = document.querySelectorAll(ITEM_HOLDER);
+  const inventory = items.item(0).parentElement.parentElement;
+
+  return { inventory, items };
 };
 
 class SteamBulkSell {
+  logger: any;
+  selectedItems: any;
+  static instance;
+
   constructor() {
     this.logger = console;
     this.selectedItems = {};
+    SteamBulkSell.instance = this;
   }
 
   async toggleItem(itemId: string, selected: boolean): Promise<any> {
     const itemData = parseItemData(itemId);
-    const response = await getInventory();
+    const {
+      g_strCountryCode: countryCode,
+      g_ActiveInventory: {
+        appid: appId,
+        contextid: contextId,
+        m_steamid: steamId,
+        m_cItems: itemsCount,
+      },
+    } = pageWindow;
+
+    const response = await getInventory(steamId, appId, contextId, countryCode, itemsCount).then(response => response.json());
     console.log(response);
     console.log(itemData);
     const { assets, descriptions, success } = response;
@@ -95,7 +80,7 @@ class SteamBulkSell {
     const g_rgWalletInfo = XPCNativeWrapper(window.wrappedJSObject.g_rgWalletInfo);
     const { wallet_currency: currencyId } = g_rgWalletInfo;
     debugger;
-    const price = await getPrice(g_strCountryCode, currencyId, app, marketHashNameEscaped);
+    const price = await getPrice(g_strCountryCode, currencyId, app, marketHashNameEscaped).then(response => response.json());
     
     const fullItemData = { ...itemData, marketHashNameEscaped, currencyId, price };
 
@@ -148,7 +133,7 @@ class SteamBulkSell {
       const checkboxStyles = {
         'position': 'absolute',
         'top': '0px',
-        'zIndex': '9000',
+        'zIndex': '2',
       };
       applyStyles(checkbox, checkboxStyles);
 
@@ -156,64 +141,16 @@ class SteamBulkSell {
       return checkbox;
     };
 
-    const hasSellableItems = (item: HTMLElement): boolean => item.hasChildNodes()
-      && item.style.display !== 'none'
-      && !item.classList.contains('disabled')
-      && !item.getElementsByTagName('input').length;
 
-    const getItems = (): any => {
-      const items = document.querySelectorAll(ITEM_HOLDER);
-      const inventory = items.item(0).parentElement.parentElement;
 
-      return { inventory, items };
-    };
-
-    const mountCheckboxes = (items: any): void => {
-      Array.from(items).filter(hasSellableItems).forEach((item: any) => {
-        this.logger.log('Checkboxes', 'Mount');
-        mountCheckbox(item);
-      });
+    const mountCheckboxes = (items: Array<HTMLElement>): void => {
+      Array.from(items).filter(hasSellableItems).forEach(item => mountCheckbox(item));
+      this.logger.log('Checkboxes', 'Mount');
     };
 
     const createControls = (): any => {
       const getControlsWrapper = (): HTMLElement => {
         return document.querySelector(LOG_WRAPPER);
-      };
-
-
-
-
-
-      const sellItem = (item: any) => {
-        const { appid, contextid, assetid, price } = item;
-        const g_sessionID = XPCNativeWrapper(window.wrappedJSObject.g_sessionID);
-
-        const requestData = {
-          sessionid: g_sessionID,
-          appid,
-          contextid,
-          assetid,
-          amount: 1,
-          price,
-        };
-        const requestConfig: RequestInit = {
-          method: 'POST',
-          cache: 'no-cache',
-          mode: 'cors',
-          body: JSON.stringify(requestData),
-        };
-        fetch(SELL_URL, requestConfig)
-          .then((response) => response.json())
-          .then((data) => {
-            console.log('Success:', data);
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
-      };
-
-      const sellItems = () => {
-
       };
 
       const mountControls = (container: HTMLElement): HTMLElement => {

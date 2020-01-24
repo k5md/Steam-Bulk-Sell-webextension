@@ -17,5 +17,8 @@
     },
     "lib": ["es6", "es7", "dom", "esnext"]
   },
+  "include": [
+    "**/src/**/*.ts"
+  ],
   "exclude": ["dist", "build", "node_modules"]
 }

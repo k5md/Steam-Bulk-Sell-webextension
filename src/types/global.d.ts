@@ -12,6 +12,7 @@ declare global {
   interface Window {
     wrappedJSObject: any;
   }
+  let XPCNativeWrapper: any;
 }
 
 declare const PRODUCTION: boolean;
