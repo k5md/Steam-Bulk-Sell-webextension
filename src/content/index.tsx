@@ -21,6 +21,7 @@ const LOG_WRAPPER = '#inventory_logos';
 const ITEM_HOLDER = ':scope #inventories .inventory_page .itemHolder';
 const INVENTORY_URL = 'https://steamcommunity.com/inventory';
 const SELL_URL = 'https://steamcommunity.com/market/sellitem';
+const PRICE_URL = 'https://steamcommunity.com/market/priceoverview';
 
 interface SteamBulkSell {
   logger: any;
@@ -58,8 +59,13 @@ const getInventory = (): any => {
   return fetch(url, requestConfig).then(response => response.json());
 };
 
-const getPrice = () => {
-
+const getPrice = (country, currencyId, appId, marketHashName) => {
+  const url = `${PRICE_URL}/?country=${country}&currency=${currencyId}&appid=${appId}&market_hash_name=${marketHashName}`;
+  const requestConfig: RequestInit = {
+    "credentials": "include",
+    "mode": "cors"
+  };
+  return fetch(url, requestConfig).then(response => response.json());
 };
 
 class SteamBulkSell {
@@ -75,8 +81,25 @@ class SteamBulkSell {
     console.log(itemData);
     const { assets, descriptions, success } = response;
 
+    // first we get instanceid by aseetid, contextid and appid from assets array
+    const { app, context, asset } = itemData;
+    // note, that appid is not a string
+    const item = assets.find(item => String(item.appid) === app && item.contextid === context && item.assetid === asset);
+    const { instanceid } = item;
 
-    this.selectedItems[itemId] = selected ? itemData : null;
+    // second we get raw marketHashName by instanceid from descriptions
+    const description = descriptions.find(item => item.instanceid === instanceid);
+    const { market_hash_name: marketHashName } = description;
+    const marketHashNameEscaped = encodeURIComponent(marketHashName);
+    const g_strCountryCode = XPCNativeWrapper(window.wrappedJSObject.g_strCountryCode);
+    const g_rgWalletInfo = XPCNativeWrapper(window.wrappedJSObject.g_rgWalletInfo);
+    const { wallet_currency: currencyId } = g_rgWalletInfo;
+    debugger;
+    const price = await getPrice(g_strCountryCode, currencyId, app, marketHashNameEscaped);
+    
+    const fullItemData = { ...itemData, marketHashNameEscaped, currencyId, price };
+
+    this.selectedItems[itemId] = selected ? fullItemData : null;
     this.logger.log(JSON.stringify(this.selectedItems, null, '  '), 'Checked items');
   }
 
