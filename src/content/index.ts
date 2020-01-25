@@ -1,212 +1,102 @@
-import { checkElement, applyStyles, applyProperties, getOriginalWindow } from '../utils';
-import { getInventory, getPrice, sellItem } from './API';
-const LOG_WRAPPER = '#inventory_logos';
-const ITEM_HOLDER = ':scope #inventories .inventory_page .itemHolder';
-
-
-const EXTENSION_NAME = 'steambulksell';
-const pageWindow = getOriginalWindow(window);
-
-
-const hideAppLogo = () => {
-  const appLogo: HTMLElement = document.querySelector('#inventory_applogo');
-  appLogo.style.display = 'none';
-  const inventoryLogos: HTMLElement = document.querySelector(LOG_WRAPPER);
-  inventoryLogos.style.height = 'unset';
-};
-
-const parseItemData = (id: string) => {
-  const [ app, context, asset ] = id.split('_');
-  return { app, context, asset };
-}
-
-
-
-const sellItems = () => {
-
-};
-
-const hasSellableItems = (item: HTMLElement): boolean => item.hasChildNodes()
-  && item.style.display !== 'none'
-  && !item.classList.contains('disabled')
-  && !item.getElementsByTagName('input').length;
-
-const getItems = (): any => {
-  const items = document.querySelectorAll(ITEM_HOLDER);
-  const inventory = items.item(0).parentElement.parentElement;
-
-  return { inventory, items };
-};
+import Controls from './Controls';
+import Logger from './Logger';
+import Overlay from './Overlay';
+import { getOriginalWindow } from '../utils';
+import { getInventory, getPrice } from './API';
 
 class SteamBulkSell {
-  logger: any;
-  selectedItems: any;
-  static instance;
+  constructor(
+    private logger: { log: Function } = console,
+    private items: object = {},
+  ) {}
 
-  constructor() {
-    this.logger = console;
-    this.selectedItems = {};
-    SteamBulkSell.instance = this;
-  }
-
-  async toggleItem(itemId: string, selected: boolean): Promise<any> {
-    const itemData = parseItemData(itemId);
+  async findItem(appId: string, contextId: string, assetId: string): Promise<object> {
+    const pageWindow = getOriginalWindow(window);
     const {
       g_strCountryCode: countryCode,
-      g_ActiveInventory: {
-        appid: appId,
-        contextid: contextId,
-        m_steamid: steamId,
-        m_cItems: itemsCount,
-      },
+      g_ActiveInventory: { m_steamid: steamId, m_cItems: itemsCount },
+      g_rgWalletInfo: { wallet_currency: currencyId }
     } = pageWindow;
 
-    const response = await getInventory(steamId, appId, contextId, countryCode, itemsCount).then(response => response.json());
-    console.log(response);
-    console.log(itemData);
-    const { assets, descriptions, success } = response;
-
+    const {
+      assets,
+      descriptions,
+      success: inventorySuccess,
+    } = await getInventory(steamId, appId, contextId, countryCode, itemsCount).then(response => response.json());
+    if (!inventorySuccess) {
+      this.logger.log(`Inventory request failed`, 'Error');
+      return;
+    }
     // first we get instanceid by aseetid, contextid and appid from assets array
-    const { app, context, asset } = itemData;
-    // note, that appid is not a string
-    const item = assets.find(item => String(item.appid) === app && item.contextid === context && item.assetid === asset);
-    const { instanceid } = item;
+    // NOTE: item.appid is not a string
+    const isItem = (item): boolean => String(item.appid) === appId
+      && item.contextid === contextId
+      && item.assetid === assetId;
+    const item = assets.find(isItem);
+    if (!item) { 
+      this.logger.log(`Inventory asset lookup failed`, 'Error');
+      return;
+    }
+    const { instanceid: instanceId } = item;
 
     // second we get raw marketHashName by instanceid from descriptions
-    const description = descriptions.find(item => item.instanceid === instanceid);
+    const description = descriptions.find(item => item.instanceid === instanceId);
+    if (!description) { 
+      this.logger.log(`Inventory description lookup failed`, 'Error');
+      return;
+    }
     const { market_hash_name: marketHashName } = description;
-    const marketHashNameEscaped = encodeURIComponent(marketHashName);
-    const g_strCountryCode = XPCNativeWrapper(window.wrappedJSObject.g_strCountryCode);
-    const g_rgWalletInfo = XPCNativeWrapper(window.wrappedJSObject.g_rgWalletInfo);
-    const { wallet_currency: currencyId } = g_rgWalletInfo;
-    debugger;
-    const price = await getPrice(g_strCountryCode, currencyId, app, marketHashNameEscaped).then(response => response.json());
-    
-    const fullItemData = { ...itemData, marketHashNameEscaped, currencyId, price };
+    const {
+      median_price: price,
+      success: priceSuccess,
+    } = await getPrice(countryCode, currencyId, appId, encodeURIComponent(marketHashName)).then(response => response.json());
 
-    this.selectedItems[itemId] = selected ? fullItemData : null;
-    this.logger.log(JSON.stringify(this.selectedItems, null, '  '), 'Checked items');
+    if (!priceSuccess) { 
+      this.logger.log(`Inventory description lookup failed`, 'Error');
+      return;
+    }
+
+    const itemData = {
+      appId,
+      contextId,
+      assetId,
+      marketHashName: encodeURIComponent(marketHashName),
+      currencyId,
+      price,
+    };
+
+    return itemData;
   }
 
-  mount(): void {
-    const createLogger = (): object => {
-      const getLogWrapper = (): HTMLElement => {
-        return document.querySelector(LOG_WRAPPER);
-      };
+  sellHandler = async (): Promise<void> => {
+    return Promise.resolve();
+  }
 
-      const mountLogger = (container: HTMLElement): HTMLElement => {
-        const log = document.createElement('div');
-        const logStyles = {
-          'height': '70px',
-          'overflow-y': 'scroll',
-          'word-wrap': 'anywhere',
-        };
-        applyStyles(log, logStyles);
-  
-        container.appendChild(log);
-        return log;
-      };
+  toggleHandler = async (itemId: string, selected: boolean): Promise<void> => {
+    const [ appId, contextId, assetId ] = itemId.split('_');
 
-      const wrapper = getLogWrapper();
-      const element = mountLogger(wrapper);
-      const log = (message: string, tag = 'Main'): void => {
-        const entry = document.createElement('div');
-        entry.innerHTML = `[${tag}]: ${message}`
-        element.appendChild(entry);
-        element.scrollTop = element.scrollHeight;
-      };
+    if (Object.keys(this.items).includes(itemId)) {
+      this.items[itemId].selected = selected;
+      this.logger.log(JSON.stringify(this.items[itemId], null, '  '), 'Deselected');
+    }
+ 
+    const itemData = await this.findItem(appId, contextId, assetId);
+    this.items[itemId] = { ...itemData, selected: true };
+    this.logger.log(JSON.stringify(itemData, null, '  '), 'Selected');
+  }
 
-      return { wrapper, element, log };
-    };
+  async init(): Promise<void> {
+    const logger = new Logger();
+    await logger.init();
+    this.logger = logger;
 
-    const mountCheckbox = (container: HTMLElement): HTMLElement => {
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = false;
-      checkbox.onchange = (e) => {
-        const target = e.target as HTMLInputElement;
-        const itemElement = target.previousSibling as HTMLElement;
-        const itemId = itemElement.id;
-        
-        this.toggleItem(itemId, target.checked)
-      };
-      const checkboxStyles = {
-        'position': 'absolute',
-        'top': '0px',
-        'zIndex': '2',
-      };
-      applyStyles(checkbox, checkboxStyles);
+    const controls = new Controls(logger, this.sellHandler);
+    await controls.init();
 
-      container.appendChild(checkbox);
-      return checkbox;
-    };
-
-
-
-    const mountCheckboxes = (items: Array<HTMLElement>): void => {
-      Array.from(items).filter(hasSellableItems).forEach(item => mountCheckbox(item));
-      this.logger.log('Checkboxes', 'Mount');
-    };
-
-    const createControls = (): any => {
-      const getControlsWrapper = (): HTMLElement => {
-        return document.querySelector(LOG_WRAPPER);
-      };
-
-      const mountControls = (container: HTMLElement): HTMLElement => {
-        const sellButton = document.createElement('input');
-        const sellButtonStyles = {
-          'margin-top': '10px',
-        };
-        sellButton.type = 'button';
-        sellButton.value = 'Sell selected items';
-        sellButton.className = 'btn_darkblue_white_innerfade btn_medium new_trade_offer_btn';
-        sellButton.onclick = sellItems;
-        applyStyles(sellButton, sellButtonStyles);
-  
-        container.appendChild(sellButton);      
-        return sellButton;
-      };
-
-      const wrapper = getControlsWrapper();
-      const element = mountControls(wrapper);
-      const sell = (): void => {};
-
-      return { wrapper, element, sell };
-    };
-
-    checkElement(LOG_WRAPPER).then(() => {
-      hideAppLogo();
-
-      const logger = createLogger();
-      this.logger = logger;
-      this.logger.log('Logger', 'Mount');
-
-      const controls = createControls();
-      this.logger.log('Controls', 'Mount');
-    });
-    
-    checkElement(ITEM_HOLDER).then(() => {
-      // when at least one item holder is loaded start mounting checkboxes
-      const { items } = getItems();
-      mountCheckboxes(items);
-
-      // additional itemholders are loaded asynchronously, so watch inventory container
-      // and mount checkboxes on change
-      // TODO: optimize this bullshit
-      // TODO: refactor
-      const observer = new MutationObserver(() => {
-        const { items } = getItems();
-        mountCheckboxes(items);
-      });
-      const { inventory } = getItems();
-
-      observer.observe(inventory, { childList: true, subtree: true });
-    });
-
-
+    const overlay = new Overlay(logger, this.toggleHandler);
+    await overlay.init();
   }
 }
 
 const instance = new SteamBulkSell();
-instance.mount();
+instance.init();
