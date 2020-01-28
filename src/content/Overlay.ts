@@ -1,14 +1,15 @@
 import { uniqueId, flatten, debounce } from 'lodash';
 import { applyStyles, checkElement, checkElements } from '../utils';
-
-const EXTENSION_NAME = 'steambulksell';
-const INVENTORIES_WRAPPER = ':scope #active_inventory_page #inventories';
-const INVENTORY = '.inventory_ctn';
-const INVENTORY_PAGE = '.inventory_page';
-const ITEM_HOLDER = '.itemHolder';
-const PREVIOUS_INVENTORY_PAGE = '#pagebtn_previous';
-const NEXT_INVENTORY_PAGE = '#pagebtn_next';
-const INVENTORY_PAGE_TABS = ':scope .games_list_tabs .games_list_tab[id^="inventory_link_"]';
+import {
+  EXTENSION_NAME,
+  INVENTORIES_WRAPPER,
+  INVENTORY,
+  INVENTORY_PAGE,
+  ITEM_HOLDER,
+  PREVIOUS_INVENTORY_PAGE,
+  NEXT_INVENTORY_PAGE,
+  INVENTORY_PAGE_TABS,
+} from './constants';
 
 export class Overlay{
   constructor(

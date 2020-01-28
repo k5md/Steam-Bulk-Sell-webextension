@@ -1,8 +1,9 @@
 import { applyStyles, checkElement } from '../utils';
-
-const LOG_WRAPPER = '#inventory_logos';
-const APP_LOGO = '#inventory_applogo';
-const EXTENSION_NAME = 'steambulksell';
+import {
+  EXTENSION_NAME,
+  LOG_WRAPPER,
+  APP_LOGO,
+} from './constants';
 
 export class Logger {
   constructor(

@@ -1,8 +1,9 @@
 import { checkElement, applyStyles } from '../utils';
-
-const CONTROLS_WRAPPER = '#inventory_logos';
-const EXTENSION_NAME = 'steambulksell';
-const APP_LOGO = '#inventory_applogo';
+import {
+  EXTENSION_NAME,
+  CONTROLS_WRAPPER,
+  APP_LOGO,
+} from './constants';
 
 export class Controls {
   constructor(
