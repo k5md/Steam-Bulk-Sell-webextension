@@ -14,7 +14,7 @@ export class Logger {
     const logger = document.createElement('div');
     logger.id = `${EXTENSION_NAME}-Logger`;
     const logStyles = {
-      'height': '70px',
+      'height': '100px',
       'overflow-y': 'scroll',
       'word-wrap': 'anywhere',
     };

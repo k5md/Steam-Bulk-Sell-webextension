@@ -18,39 +18,42 @@ export class Overlay{
     private overlayContainer: HTMLElement = null,
   ) {}
 
-  mount(container: HTMLElement): Array<HTMLElement> { 
-    const hasSellableItems = (item: HTMLElement): boolean => item.hasChildNodes()
+  hasSellableItems = (item: HTMLElement): boolean => {
+    return item.hasChildNodes()
       && item.style.display !== 'none'
       && !item.classList.contains('disabled')
       && !item.getElementsByTagName('input').length; // NOTE: <- this particular check is for already mounted checkboxes
+  }
 
-    const mountCheckbox = (container: HTMLElement): HTMLElement => {
-      const checkbox = document.createElement('input');
-      checkbox.id = `${EXTENSION_NAME}-Overlay-${uniqueId()}`;
-      checkbox.type = 'checkbox';
-      checkbox.checked = false;
-      // TODO: consider making onchange handler lighter
-      checkbox.onchange = async (e): Promise<void> => {
-        const target = e.target as HTMLInputElement;
-        if (!target.previousSibling) {
-          this.logger.log(`Previous sibling is null`, 'Error');
-          return;
-        }
-        const itemElement = target.previousSibling as HTMLElement;
-        const itemId = itemElement.id;
-        await this.toggleHandler(itemId, target.checked);
-      };
-      const checkboxStyles = {
-        'position': 'absolute',
-        'top': '0px',
-        'zIndex': '2',
-      };
-      applyStyles(checkbox, checkboxStyles);
-
-      container.appendChild(checkbox);
-      return checkbox;
+  mountCheckbox = (container: HTMLElement): HTMLElement => {
+    const checkbox = document.createElement('input');
+    checkbox.id = `${EXTENSION_NAME}-Overlay-${uniqueId()}`;
+    checkbox.type = 'checkbox';
+    checkbox.checked = false;
+    // TODO: consider making onchange handler lighter
+    checkbox.onchange = async (e): Promise<void> => {
+      const target = e.target as HTMLInputElement;
+      if (!target.previousSibling) {
+        this.logger.log(`Previous sibling is null`, 'Error');
+        return;
+      }
+      const itemElement = target.previousSibling as HTMLElement;
+      const itemId = itemElement.id;
+      await this.toggleHandler(itemId, target.checked);
     };
-    
+    const checkboxStyles = {
+      'position': 'absolute',
+      'top': '0px',
+      'zIndex': '2',
+    };
+    applyStyles(checkbox, checkboxStyles);
+
+    container.appendChild(checkbox);
+    return checkbox;
+  }
+
+  mount(container: HTMLElement): Array<HTMLElement> { 
+    //TODO: make use of pages in g_ActiveInventory, since it would allow for filtering sellable/not sellable items
     // inventory wrapper contains #inventory_steamid_appid_contextid for every app,
     // inactive of them have style.display set to none
     // each #inventory... contains .inventory_page elements, that contain item holders
@@ -59,7 +62,7 @@ export class Overlay{
     const activeItemHolders = activePage.querySelectorAll(ITEM_HOLDER);
 
     const wrapped = Array.from(activeItemHolders) as Array<HTMLElement>;
-    const elements = wrapped.filter(hasSellableItems).map(mountCheckbox);
+    const elements = wrapped.filter(this.hasSellableItems).map(this.mountCheckbox);
     return elements;
   }
 
@@ -118,7 +121,7 @@ export class Overlay{
     // global g_ActiveInventory.nextPage function, which loads data (if not loaded) and animates the transition
     // so, either wrap this nextPage function, or observe g_ActiveInventory.m_iCurrentPage property, or just wait
     // at least 250ms for transition to complete
-    const rerenderDelay = 250; // ms
+    const rerenderDelay = 300; // ms
     flatten(listenables).forEach(
       listenable => listenable.addEventListener('click', debounce(this.render, rerenderDelay))
     );

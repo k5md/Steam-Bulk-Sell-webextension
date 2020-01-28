@@ -37,10 +37,10 @@ class SteamBulkSell {
       this.logger.log(`Inventory asset lookup failed`, 'Error');
       return;
     }
-    const { instanceid: instanceId } = item;
+    const { classid: classId } = item;
 
-    // second we get raw marketHashName by instanceid from descriptions
-    const description = descriptions.find(item => item.instanceid === instanceId);
+    // second we get raw marketHashName by classId from descriptions
+    const description = descriptions.find(item => String(item.appid) === appId && item.classid === classId);
     if (!description) { 
       this.logger.log(`Inventory description lookup failed`, 'Error');
       return;
@@ -69,6 +69,7 @@ class SteamBulkSell {
   }
 
   sellHandler = async (): Promise<void> => {
+    this.logger.log(JSON.stringify(this.items));
     return Promise.resolve();
   }
 
