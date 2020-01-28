@@ -33,10 +33,6 @@ export class Controls {
   }
 
   reset(container: HTMLElement): void {
-    // hide application logo
-    const appLogo: HTMLElement = container.querySelector(APP_LOGO);
-    appLogo.style.display = 'none';
-
     // remove existing controls
     const elements = container.querySelectorAll(`#${EXTENSION_NAME}-Controls`);
     elements.forEach(element => container.removeChild(element));

@@ -46,10 +46,17 @@ export class Logger {
   }
 
   async init(): Promise<void> {
-    return checkElement(LOG_WRAPPER).then(() => {
+    checkElement(LOG_WRAPPER).then(() => {
       const container = document.querySelector(LOG_WRAPPER) as HTMLElement;
       this.reset(container);
       this.mount(container);
+
+      const appLogo: HTMLElement = container.querySelector(APP_LOGO);
+      const observer = new MutationObserver(() => {
+        this.reset(container);
+        this.mount(container);
+      });
+      observer.observe(appLogo, { attributeFilter: ['src'] });
     });
   }
 }
