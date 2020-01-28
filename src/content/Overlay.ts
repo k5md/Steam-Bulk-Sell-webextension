@@ -1,16 +1,20 @@
-import { uniqueId } from 'lodash';
-import { applyStyles, checkElement } from '../utils';
+import { uniqueId, flatten, debounce } from 'lodash';
+import { applyStyles, checkElement, checkElements } from '../utils';
 
 const EXTENSION_NAME = 'steambulksell';
 const INVENTORIES_WRAPPER = ':scope #active_inventory_page #inventories';
 const INVENTORY = '.inventory_ctn';
 const INVENTORY_PAGE = '.inventory_page';
 const ITEM_HOLDER = '.itemHolder';
+const PREVIOUS_INVENTORY_PAGE = '#pagebtn_previous';
+const NEXT_INVENTORY_PAGE = '#pagebtn_next';
+const INVENTORY_PAGE_TABS = ':scope .games_list_tabs .games_list_tab[id^="inventory_link_"]';
 
 export class Overlay{
   constructor(
     private logger: { log: Function } = console,
     private toggleHandler: (itemId: string, checked: boolean) => Promise<void> = (): Promise<void> => Promise.resolve(),
+    private overlayContainer: HTMLElement = null,
   ) {}
 
   mount(container: HTMLElement): Array<HTMLElement> { 
@@ -91,28 +95,32 @@ export class Overlay{
     elements.forEach(element => container.removeChild(element));
   }
 
-  async init(): Promise<void> {
-    await checkElement(INVENTORIES_WRAPPER).then(() => {
-      // when at least one item holder is loaded start mounting checkboxes
-      const container = document.querySelector(INVENTORIES_WRAPPER) as HTMLElement;
-      this.logger.log('Mounting overlay...');
-      this.reset(container);
-      this.mount(container);
-      this.logger.log('Mounted overlay');
-    });
+  render = (): void => {
+    this.logger.log('Rendering overlay...');
+    this.clear(this.overlayContainer);
+    this.mount(this.overlayContainer);
+    this.logger.log('Rendered overlay');
+  }
 
-    await checkElement(INVENTORIES_WRAPPER).then(() => {
-      // additional itemholders are loaded asynchronously, watch inventory container,
-      // mount checkboxes on change, unmount not visible ones
-      // BUG: mutationobserver doesnt observe style changes, so when pages are loaded, but their visibility
-      // changes, inactive checkboxes do not unmounted AND new checkboxes are not mounted
-      const container = document.querySelector(INVENTORIES_WRAPPER) as HTMLElement;
-      const observer = new MutationObserver(() => {
-        this.clear(container)
-        this.mount(container);
-      });     
-      observer.observe(container, { childList: true, subtree: true });
-    });
+  async init(): Promise<void> {
+    const container = await checkElement(INVENTORIES_WRAPPER) as HTMLElement;
+    this.overlayContainer = container;
+    this.render();
+
+    const listenables = await Promise.all([
+      checkElement(PREVIOUS_INVENTORY_PAGE),
+      checkElement(NEXT_INVENTORY_PAGE),
+      checkElements(INVENTORY_PAGE_TABS),
+    ]);
+
+    // a click on prev/next button calls inventory(Next|Previous)Page, which is actually a call to
+    // global g_ActiveInventory.nextPage function, which loads data (if not loaded) and animates the transition
+    // so, either wrap this nextPage function, or observe g_ActiveInventory.m_iCurrentPage property, or just wait
+    // at least 250ms for transition to complete
+    const rerenderDelay = 250; // ms
+    flatten(listenables).forEach(
+      listenable => listenable.addEventListener('click', debounce(this.render, rerenderDelay))
+    );
   }
 }
 

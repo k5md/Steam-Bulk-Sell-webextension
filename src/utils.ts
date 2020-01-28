@@ -13,6 +13,12 @@ export const checkElement = async (selector: string): Promise<Element> => {
   return querySelector;
 };
 
+export const checkElements = async (selector: string): Promise<Array<Element>> => {
+  const querySelectorAll = document.querySelectorAll(selector);
+  while (!querySelectorAll.length) await requestAnimationFrameAsync();
+  return Array.from(querySelectorAll);
+};
+
 // To access page global variables from content script we need to get not xrayed window and
 // Wrap requested properties in native wrapper for safety's sake
 export const getOriginalWindow = (window: Window): any => new Proxy(window.wrappedJSObject, {
