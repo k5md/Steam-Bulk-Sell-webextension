@@ -1,14 +1,38 @@
 import Controls from './Controls';
 import Logger from './Logger';
 import Overlay from './Overlay';
-import { getOriginalWindow } from '../utils';
+import { getOriginalWindow, checkElements } from '../utils';
 import { getInventory, getPrice } from './API';
+import { INVENTORY_PAGE_TABS } from './constants';
 
 class SteamBulkSell {
   constructor(
     private logger: { log: Function } = console,
     private items: object = {},
+    private inventory: object = {},
   ) {}
+
+  async fetchInventory(
+    steamId: string | number,
+    appId: string | number,
+    contextId: string | number,
+    countryCode: string,
+    itemsCount: string | number,
+): Promise<void> {
+    const {
+      assets,
+      descriptions,
+      success: inventorySuccess,
+    } = await getInventory(steamId, appId, contextId, countryCode, itemsCount).then(response => response.json());
+
+    if (!inventorySuccess) {
+      this.logger.log(`Inventory request failed`, 'Error');
+      return;
+    }
+
+    const cacheKey = [steamId, appId, contextId, countryCode].join('_');
+    this.inventory[cacheKey] = { assets, descriptions };
+  }
 
   async findItem(appId: string, contextId: string, assetId: string): Promise<object> {
     const pageWindow = getOriginalWindow(window);
@@ -17,41 +41,27 @@ class SteamBulkSell {
       g_ActiveInventory: { m_steamid: steamId, m_cItems: itemsCount },
       g_rgWalletInfo: { wallet_currency: currencyId }
     } = pageWindow;
-
-    const {
-      assets,
-      descriptions,
-      success: inventorySuccess,
-    } = await getInventory(steamId, appId, contextId, countryCode, itemsCount).then(response => response.json());
-    if (!inventorySuccess) {
-      this.logger.log(`Inventory request failed`, 'Error');
-      return;
+    
+    const cacheKey = [steamId, appId, contextId, countryCode].join('_');
+    if (!Object.prototype.hasOwnProperty.call(this.inventory, cacheKey)) {
+      await this.fetchInventory(steamId, appId, contextId, countryCode, itemsCount);
     }
-    // first we get instanceid by aseetid, contextid and appid from assets array
+    const { assets, descriptions } = this.inventory[cacheKey];
+    
     // NOTE: item.appid is not a string
     const isItem = (item): boolean => String(item.appid) === appId
       && item.contextid === contextId
       && item.assetid === assetId;
-    const item = assets.find(isItem);
-    if (!item) { 
-      this.logger.log(`Inventory asset lookup failed`, 'Error');
-      return;
-    }
-    const { classid: classId } = item;
+    const { classid: classId } = assets.find(isItem); // first we get classId from assets array
 
-    // second we get raw marketHashName by classId from descriptions
-    const description = descriptions.find(item => String(item.appid) === appId && item.classid === classId);
-    if (!description) { 
-      this.logger.log(`Inventory description lookup failed`, 'Error');
-      return;
-    }
-    const { market_hash_name: marketHashName } = description;
+    const isItemDescription = (item): boolean => String(item.appid) === appId && item.classid === classId;
+    const { market_hash_name: marketHashName } = descriptions.find(isItemDescription); // second we get raw marketHashName by classId
+ 
     const {
       median_price: price,
       success: priceSuccess,
     } = await getPrice(countryCode, currencyId, appId, encodeURIComponent(marketHashName)).then(response => response.json());
-
-    if (!priceSuccess) { 
+    if (!priceSuccess) {
       this.logger.log(`Inventory description lookup failed`, 'Error');
       return;
     }
@@ -69,21 +79,21 @@ class SteamBulkSell {
   }
 
   sellHandler = async (): Promise<void> => {
-    this.logger.log(JSON.stringify(this.items));
+    const sellables = Object.values(this.items).filter(item => item.selected);
+    this.logger.log(JSON.stringify(sellables.map(({ marketHashName, price }) => ({ marketHashName, price })), null, 2), 'Sell');
     return Promise.resolve();
   }
 
   toggleHandler = async (itemId: string, selected: boolean): Promise<void> => {
     const [ appId, contextId, assetId ] = itemId.split('_');
 
-    if (Object.keys(this.items).includes(itemId)) {
-      this.items[itemId].selected = selected;
-      this.logger.log(JSON.stringify(this.items[itemId], null, '  '), 'Deselected');
+    if (!Object.keys(this.items).includes(itemId)) {
+      const itemData = await this.findItem(appId, contextId, assetId);
+      this.items[itemId] = { ...itemData };
     }
  
-    const itemData = await this.findItem(appId, contextId, assetId);
-    this.items[itemId] = { ...itemData, selected: true };
-    this.logger.log(JSON.stringify(itemData, null, '  '), 'Selected');
+    this.items[itemId].selected = selected;
+    this.logger.log(JSON.stringify(this.items[itemId], null, '  '));
   }
 
   async init(): Promise<void> {
@@ -96,6 +106,13 @@ class SteamBulkSell {
 
     const overlay = new Overlay(logger, this.toggleHandler);
     await overlay.init();
+
+    checkElements(INVENTORY_PAGE_TABS).then(() => {
+      const inventoryPageTabs = document.querySelectorAll(INVENTORY_PAGE_TABS);
+      Array.from(inventoryPageTabs).forEach(tab => tab.addEventListener('click', () => {
+        this.items = {};
+      }));
+    });
   }
 }
 

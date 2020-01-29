@@ -12,6 +12,7 @@ export const getInventory = (
   const url = `${INVENTORY_URL}/${steamId}/${appId}/${contextId}?l=${countryCode}&count=${itemsCount}`;
   const requestConfig: RequestInit = {
     method: 'GET',
+    cache: 'default',
     mode: 'same-origin',
     credentials: 'same-origin',
   };
@@ -26,8 +27,9 @@ export const getPrice = (
 ): Promise<Response> => {
   const url = `${PRICE_URL}/?country=${countryCode}&currency=${currencyId}&appid=${appId}&market_hash_name=${marketHashName}`;
   const requestConfig: RequestInit = {
-    "credentials": "include",
-    "mode": "cors",
+    credentials: "include",
+    cache: 'no-cache',
+    mode: "cors",
   };
   return fetch(url, requestConfig);
 };

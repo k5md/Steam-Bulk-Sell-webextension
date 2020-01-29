@@ -111,20 +111,23 @@ export class Overlay{
     this.overlayContainer = container;
     this.render();
 
-    const listenables = await Promise.all([
+    const pageControls = await Promise.all([
       checkElement(PREVIOUS_INVENTORY_PAGE),
       checkElement(NEXT_INVENTORY_PAGE),
-      checkElements(INVENTORY_PAGE_TABS),
     ]);
+
+    const inventoryPageTabs = await checkElements(INVENTORY_PAGE_TABS);
 
     // a click on prev/next button calls inventory(Next|Previous)Page, which is actually a call to
     // global g_ActiveInventory.nextPage function, which loads data (if not loaded) and animates the transition
     // so, either wrap this nextPage function, or observe g_ActiveInventory.m_iCurrentPage property, or just wait
     // at least 250ms for transition to complete
     const rerenderDelay = 300; // ms
-    flatten(listenables).forEach(
-      listenable => listenable.addEventListener('click', debounce(this.render, rerenderDelay))
+    Array.from(pageControls).forEach(
+      listenable => listenable.addEventListener('click', debounce(() => this.mount(this.overlayContainer), rerenderDelay))
     );
+
+    Array.from(inventoryPageTabs).forEach(tab => tab.addEventListener('click', debounce(this.render)));
   }
 }
 

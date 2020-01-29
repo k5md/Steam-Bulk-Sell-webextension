@@ -2,7 +2,6 @@ import { checkElement, applyStyles } from '../utils';
 import {
   EXTENSION_NAME,
   CONTROLS_WRAPPER,
-  APP_LOGO,
 } from './constants';
 
 export class Controls {

@@ -39,7 +39,7 @@ export class Logger {
   }
 
   log(message: string, tag = 'Main'): void {
-    const entry = document.createElement('div');
+    const entry = document.createElement('pre');
     entry.innerHTML = `[${tag}]: ${message}`
     this.element.appendChild(entry);
     this.element.scrollTop = this.element.scrollHeight; // automatically scroll to the bottom
