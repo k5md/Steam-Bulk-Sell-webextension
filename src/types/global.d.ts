@@ -13,6 +13,7 @@ declare global {
     wrappedJSObject: any;
   }
   let XPCNativeWrapper: any;
+  let browser: any;
 }
 
 declare const PRODUCTION: boolean;

@@ -19,7 +19,7 @@ export class Controls {
       'margin-top': '10px',
     };
     sellButton.type = 'button';
-    sellButton.value = 'Sell selected items';
+    sellButton.value = browser.i18n.getMessage("controls_button_sell");
     sellButton.className = 'btn_darkblue_white_innerfade btn_medium new_trade_offer_btn';
     sellButton.onclick = (): void => {
       this.sellHandler();
@@ -40,10 +40,10 @@ export class Controls {
   async init(): Promise<void> {
     return checkElement(CONTROLS_WRAPPER).then(() => {
       const container = document.querySelector(CONTROLS_WRAPPER) as HTMLElement;
-      this.logger.log('Mounting controls...');
+      this.logger.log('[?]Controls', 'Mount');
       this.reset(container);
       this.mount(container);
-      this.logger.log('Mounted controls');
+      this.logger.log('[✓]Controls', 'Mount');
     });
   }
 }

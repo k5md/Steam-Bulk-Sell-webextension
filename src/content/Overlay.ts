@@ -100,10 +100,10 @@ export class Overlay{
   }
 
   render = (): void => {
-    this.logger.log('Rendering overlay...');
+    this.logger.log('[?]Overlay', 'Render');
     this.clear(this.overlayContainer);
     this.mount(this.overlayContainer);
-    this.logger.log('Rendered overlay');
+    this.logger.log('[✓]Overlay', 'Render');
   }
 
   async init(): Promise<void> {

@@ -1,6 +1,28 @@
 {
   "extensionDescription": {
-    "message": "An add-on for Firefox allowing mass item selling on Steam",
+    "message": "An add-on allowing mass item selling on Steam",
     "description": "Description of the extension."
+  },
+
+
+  "controls_button_sell": {
+    "message": "Sell selected items",
+    "description": "Button title for controls panel that brings up the confirmation modal"
+  },
+
+
+  "modal_button_clear": {
+    "message": "Clear",
+    "description": "Title for button used to clear selected items list and close the modal"
+  },
+
+  "modal_button_close": {
+    "message": "Close",
+    "description": "Title for button used close the modal"
+  },
+
+  "modal_button_sell": {
+    "message": "Sell",
+    "description": "Title for button used to confirm selling selected items in modal"
   }
 }

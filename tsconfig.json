@@ -5,7 +5,6 @@
     "module": "ESNext",
     "target": "es2015",
     "moduleResolution": "node",
-    "jsx": "react",
     "allowJs": true,
     "checkJs": false,
     "removeComments": true,

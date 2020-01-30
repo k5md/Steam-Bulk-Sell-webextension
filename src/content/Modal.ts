@@ -86,7 +86,7 @@ export class Modal {
     const clearButton = document.createElement('input');
     const clearButtonStyles = { 'margin-top': '10px' };
     clearButton.type = 'button';
-    clearButton.value = 'Clear';
+    clearButton.value = browser.i18n.getMessage('modal_button_clear');
     clearButton.className = 'btn_grey_white_innerfade btn_medium';
     clearButton.onclick = (...args) => {
       const container = document.querySelector(MODAL_WRAPPER) as HTMLElement;
@@ -98,7 +98,7 @@ export class Modal {
     const closeButton = document.createElement('input');
     const closeButtonStyles = { 'margin-top': '10px' };
     closeButton.type = 'button';
-    closeButton.value = 'Close';
+    closeButton.value = browser.i18n.getMessage('modal_button_close');
     closeButton.className = 'btn_grey_white_innerfade btn_medium';
     closeButton.onclick = (...args) => {
       const container = document.querySelector(MODAL_WRAPPER) as HTMLElement;
@@ -110,7 +110,7 @@ export class Modal {
     const sellButton = document.createElement('input');
     const sellButtonStyles = { 'margin-top': '10px' };
     sellButton.type = 'button';
-    sellButton.value = 'Sell';
+    sellButton.value = browser.i18n.getMessage('modal_button_sell');
     sellButton.className = 'btn_darkblue_white_innerfade btn_medium';
     sellButton.onclick = this.sellHandler;
     applyStyles(sellButton, sellButtonStyles);
@@ -133,10 +133,10 @@ export class Modal {
   async init(): Promise<void> {
     return checkElement(MODAL_WRAPPER).then(() => {
       const container = document.querySelector(MODAL_WRAPPER) as HTMLElement;
-      this.logger.log('Mounting modal...');
+      this.logger.log('[?]Modal', 'Mount');
       this.reset(container);
       this.mount(container);
-      this.logger.log('Mounted modal');
+      this.logger.log('[✓]Modal', 'Mount');
     });
   }
 }
