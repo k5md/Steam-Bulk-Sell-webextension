@@ -1,6 +1,7 @@
 import Controls from './Controls';
 import Logger from './Logger';
 import Overlay from './Overlay';
+import Modal from './Modal';
 import { getOriginalWindow, checkElements } from '../utils';
 import { getInventory, getPrice } from './API';
 import { INVENTORY_PAGE_TABS } from './constants';
@@ -55,7 +56,11 @@ class SteamBulkSell {
     const { classid: classId } = assets.find(isItem); // first we get classId from assets array
 
     const isItemDescription = (item): boolean => String(item.appid) === appId && item.classid === classId;
-    const { market_hash_name: marketHashName } = descriptions.find(isItemDescription); // second we get raw marketHashName by classId
+    const {
+      market_hash_name: marketHashName,
+      market_name: marketName,
+      icon_url: iconUrl,
+    } = descriptions.find(isItemDescription); // second we get raw marketHashName by classId
  
     const {
       median_price: price,
@@ -73,6 +78,8 @@ class SteamBulkSell {
       marketHashName: encodeURIComponent(marketHashName),
       currencyId,
       price,
+      marketName,
+      iconUrl,
     };
 
     return itemData;
@@ -82,6 +89,19 @@ class SteamBulkSell {
     const sellables = Object.values(this.items).filter(item => item.selected);
     this.logger.log(JSON.stringify(sellables.map(({ marketHashName, price }) => ({ marketHashName, price })), null, 2), 'Sell');
     return Promise.resolve();
+  }
+
+  modalHandler = async (): Promise<void> => {
+    const clearHandler = () => {
+      this.items = {};
+    };
+
+    const closeHandler = () => {
+
+    };
+
+    const modal = new Modal(this.logger, Object.values(this.items), this.sellHandler, closeHandler, clearHandler);
+    await modal.init();
   }
 
   toggleHandler = async (itemId: string, selected: boolean): Promise<void> => {
@@ -101,7 +121,7 @@ class SteamBulkSell {
     await logger.init();
     this.logger = logger;
 
-    const controls = new Controls(logger, this.sellHandler);
+    const controls = new Controls(logger, this.modalHandler);
     await controls.init();
 
     const overlay = new Overlay(logger, this.toggleHandler);

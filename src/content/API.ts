@@ -1,6 +1,7 @@
-const INVENTORY_URL = 'https://steamcommunity.com/inventory';
-const PRICE_URL = 'https://steamcommunity.com/market/priceoverview';
-const SELL_URL = 'https://steamcommunity.com/market/sellitem';
+export const INVENTORY_URL = 'https://steamcommunity.com/inventory';
+export const PRICE_URL = 'https://steamcommunity.com/market/priceoverview';
+export const SELL_URL = 'https://steamcommunity.com/market/sellitem';
+export const ICON_URL = 'https://steamcommunity-a.akamaihd.net/economy/image';
 
 export const getInventory = (
   steamId: string | number,
@@ -56,5 +57,5 @@ export const sellItem = (
     mode: 'cors',
     body: JSON.stringify(requestData),
   };
-  return fetch(SELL_URL, requestConfig)
+  return fetch(SELL_URL, requestConfig);
 };

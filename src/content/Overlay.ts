@@ -1,4 +1,4 @@
-import { uniqueId, flatten, debounce } from 'lodash';
+import { uniqueId, debounce } from 'lodash';
 import { applyStyles, checkElement, checkElements } from '../utils';
 import {
   EXTENSION_NAME,
