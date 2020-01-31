@@ -12,6 +12,7 @@ export class Modal {
       iconUrl: string;
       marketName: string;
       price: string;
+      selected: boolean;
     }>,
     private sellHandler: (...args) => void = (): void => {},
     private closeHandler: (...args) => void = (): void => {},
@@ -39,52 +40,76 @@ export class Modal {
 
     const sellablesContainer = document.createElement('div');
     const sellablesContainerStyles = {
-      'display': 'flex',
-      'justify-content': 'space-around',
+      'overflow-y': 'auto',
     };
     applyStyles(sellablesContainer, sellablesContainerStyles);
     
-    this.items.forEach((item) => {
-      const { iconUrl, marketName, price } = item;
+    const sellables = this.items
+      .filter(item => item.selected)
+      .map(item => {
+        const { iconUrl, marketName, price } = item;
 
+        const entry = document.createElement('div');
+        const entryElementStyles = {
+          'display': 'flex',
+          'align-items': 'center',
+          'justify-content': 'space-between',
+        };
+        applyStyles(entry, entryElementStyles);
+
+        const iconElement = document.createElement('div');
+        const iconImage = document.createElement('img');
+        const width = '96f';
+        const height = '96f';
+        iconImage.src = `${ICON_URL}/${iconUrl}/${width}x${height}`;
+        iconElement.appendChild(iconImage);
+        const iconElementStyles = { 'display': 'flex' };
+        applyStyles(iconElement, iconElementStyles);
+
+        const nameElement = document.createElement('div');
+        nameElement.textContent = marketName;
+        const nameElementStyles = {};
+        applyStyles(nameElement, nameElementStyles);
+
+        const priceElement = document.createElement('div');
+        priceElement.textContent = price;
+        const priceElementStyles = {};
+        applyStyles(priceElement, priceElementStyles);
+
+        [ iconElement, nameElement, priceElement ].forEach(element => entry.appendChild(element));
+
+        return entry;
+      });
+
+    if (!sellables.length) {
       const entry = document.createElement('div');
-      const entryElementStyles = { 'display': 'flex' };
+      const entryElementStyles = {
+        'display': 'flex',
+        'align-items': 'center',
+        'justify-content': 'space-around',
+      };
       applyStyles(entry, entryElementStyles);
+      const emptyMessage = document.createElement('div');
+      emptyMessage.textContent = browser.i18n.getMessage('modal_items_empty');
+      const emptyMessageStyles = {};
+      applyStyles(emptyMessage, emptyMessageStyles);
+      entry.appendChild(emptyMessage);
+      sellables.push(entry);
+    }
 
-      const iconElement = document.createElement('div');
-      const iconImage = document.createElement('img');
-      const width = '96f';
-      const height = '96f';
-      iconImage.src = `${ICON_URL}/${iconUrl}/${width}x${height}`;
-      iconElement.appendChild(iconImage);
-      const iconElementStyles = { 'display': 'flex' };
-      applyStyles(iconElement, iconElementStyles);
+    sellables.forEach(entry => sellablesContainer.appendChild(entry));
 
-      const nameElement = document.createElement('div');
-      nameElement.textContent = marketName;
-      const nameElementStyles = { 'display': 'flex' };
-      applyStyles(nameElement, nameElementStyles);
-
-      const priceElement = document.createElement('div');
-      priceElement.textContent = price;
-      const priceElementStyles = { 'display': 'flex' };
-      applyStyles(priceElement, priceElementStyles);
-
-      [ iconElement, nameElement, priceElement ].forEach(element => entry.appendChild(element));
-      
-      sellablesContainer.appendChild(entry);
-    });
 
     const buttonsContainer = document.createElement('div');
     const buttonsContainerStyles = {
       'display': 'flex',
       'justify-content': 'space-evenly',
       'background-color': '#181818',
+      'padding': '10px',
     };
     applyStyles(buttonsContainer, buttonsContainerStyles);
 
     const clearButton = document.createElement('input');
-    const clearButtonStyles = { 'margin-top': '10px' };
     clearButton.type = 'button';
     clearButton.value = browser.i18n.getMessage('modal_button_clear');
     clearButton.className = 'btn_grey_white_innerfade btn_medium';
@@ -93,10 +118,8 @@ export class Modal {
       this.reset(container);
       return this.clearHandler(...args);
     };
-    applyStyles(clearButton, clearButtonStyles);
 
     const closeButton = document.createElement('input');
-    const closeButtonStyles = { 'margin-top': '10px' };
     closeButton.type = 'button';
     closeButton.value = browser.i18n.getMessage('modal_button_close');
     closeButton.className = 'btn_grey_white_innerfade btn_medium';
@@ -105,15 +128,12 @@ export class Modal {
       this.reset(container);
       return this.closeHandler(...args);
     };
-    applyStyles(closeButton, closeButtonStyles);
 
     const sellButton = document.createElement('input');
-    const sellButtonStyles = { 'margin-top': '10px' };
     sellButton.type = 'button';
     sellButton.value = browser.i18n.getMessage('modal_button_sell');
     sellButton.className = 'btn_darkblue_white_innerfade btn_medium';
     sellButton.onclick = this.sellHandler;
-    applyStyles(sellButton, sellButtonStyles);
 
     [ clearButton, closeButton, sellButton ].forEach(button => buttonsContainer.appendChild(button));
 
