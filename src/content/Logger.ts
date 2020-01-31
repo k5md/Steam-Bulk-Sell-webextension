@@ -53,8 +53,12 @@ export class Logger {
 
       const appLogo: HTMLElement = container.querySelector(APP_LOGO);
       const observer = new MutationObserver(() => {
-        this.reset(container);
-        this.mount(container);
+        // Hide application logo
+        const appLogo: HTMLElement = container.querySelector(APP_LOGO);
+        appLogo.style.display = 'none';
+
+        // remove fixed 69px height for wrapper
+        container.style.height = 'unset';
       });
       observer.observe(appLogo, { attributeFilter: ['src'] });
     });

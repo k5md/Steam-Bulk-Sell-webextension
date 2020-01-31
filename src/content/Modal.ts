@@ -54,6 +54,7 @@ export class Modal {
           'display': 'flex',
           'align-items': 'center',
           'justify-content': 'space-between',
+          'margin': '10px',
         };
         applyStyles(entry, entryElementStyles);
 
