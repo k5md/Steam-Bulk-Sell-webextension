@@ -16,7 +16,7 @@ export class Overlay{
   constructor(
     private logger: { log: Function } = console,
     private toggleHandler: (itemId: string, checked: boolean) => Promise<void> = (): Promise<void> => Promise.resolve(),
-    private overlayContainer: HTMLElement = null,
+    public overlayContainer: HTMLElement = null,
   ) {}
 
   hasSellableItems = (item: HTMLElement): boolean => {
@@ -97,7 +97,7 @@ export class Overlay{
    */
   reset(container: HTMLElement): void {
     const elements = container.querySelectorAll(`[id^=${EXTENSION_NAME}-Overlay]`);
-    elements.forEach(element => container.removeChild(element));
+    Array.from(elements).forEach(element => element.parentElement.removeChild(element));
   }
 
   render = (): void => {

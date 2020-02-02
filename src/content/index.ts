@@ -11,6 +11,7 @@ class SteamBulkSell {
     private logger: { log: Function } = console,
     private items: object = {},
     private inventory: object = {},
+    private overlay: Overlay = null,
   ) {}
 
   async fetchInventory(
@@ -88,6 +89,8 @@ class SteamBulkSell {
   modalHandler = async (): Promise<void> => {
     const clearHandler = () => {
       this.items = {};
+      this.overlay.reset(document.body as HTMLElement);
+      this.overlay.mount(this.overlay.overlayContainer);
     };
 
     const closeHandler = () => {
@@ -97,6 +100,8 @@ class SteamBulkSell {
     const sellHandler = async (): Promise<void> => {
       const sellables = Object.values(this.items).filter(item => item.selected);
       this.logger.log(JSON.stringify(sellables.map(({ marketHashName, price }) => ({ marketHashName, price })), null, 2), 'Sell');
+      this.overlay.reset(document.body as HTMLElement);
+      this.overlay.mount(this.overlay.overlayContainer);
       return Promise.resolve();
     };
 
@@ -126,6 +131,7 @@ class SteamBulkSell {
 
     const overlay = new Overlay(logger, this.toggleHandler);
     await overlay.init();
+    this.overlay = overlay;
 
     checkElements(INVENTORY_PAGE_TABS).then(() => {
       const inventoryPageTabs = document.querySelectorAll(INVENTORY_PAGE_TABS);
