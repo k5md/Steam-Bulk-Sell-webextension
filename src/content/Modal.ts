@@ -167,10 +167,8 @@ export class Modal {
     this.clickOutsideListener = backdrop.addEventListener('click', (e: Event) => {
       const target  = e.target as Element;
       if (target === this.modal && target.closest(MODAL_WRAPPER)) {
-        console.log('inside');
         return;
       }
-      console.log('outside');
       this.reset(this.container);
       this.closeHandler();
     });

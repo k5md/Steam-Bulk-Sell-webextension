@@ -9,6 +9,7 @@ import {
   PREVIOUS_INVENTORY_PAGE,
   NEXT_INVENTORY_PAGE,
   INVENTORY_PAGE_TABS,
+  FILTER_OPTIONS,
 } from './constants';
 
 export class Overlay{
@@ -128,14 +129,21 @@ export class Overlay{
     );
 
     Array.from(inventoryPageTabs).forEach(tab => tab.addEventListener('click', debounce(this.render)));
-
+    
+    // why? because filters could make visible items from not yet loaded pages
+    // why mutationobserver? because checkElements won't work because of weird way filters are created
+    const filtersContainer = document.querySelector(FILTER_OPTIONS);
     const observer = new MutationObserver((mutationsList) => {
       console.log(mutationsList);
+      const checkboxes = filtersContainer.querySelectorAll('input[type="checkbox"');
+      Array.from(checkboxes).forEach((checkbox: Element) => {
+        checkbox.removeEventListener('change', this.render);
+        checkbox.addEventListener('change', this.render);
+      });
     });
-    observer.observe(container, {
-      attributes: true,
-      attributeFilter: ["style"],
+    observer.observe(filtersContainer, {
       subtree: true,
+      childList: true,
     });
   }
 }

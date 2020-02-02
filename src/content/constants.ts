@@ -10,3 +10,4 @@ export const PREVIOUS_INVENTORY_PAGE = '#pagebtn_previous';
 export const NEXT_INVENTORY_PAGE = '#pagebtn_next';
 export const INVENTORY_PAGE_TABS = ':scope .games_list_tabs .games_list_tab[id^="inventory_link_"]';
 export const MODAL_WRAPPER = '#BG_bottom';
+export const FILTER_OPTIONS = '#filter_options';
