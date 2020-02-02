@@ -17,6 +17,9 @@ export class Modal {
     private sellHandler: (...args) => void = (): void => {},
     private closeHandler: (...args) => void = (): void => {},
     private clearHandler: (...args) => void = (): void => {},
+    private clickOutsideListener = null,
+    private container = null,
+    private modal = null,
   ) {}
 
   mount(container: HTMLElement): HTMLElement {
@@ -140,20 +143,50 @@ export class Modal {
 
     modal.appendChild(sellablesContainer);
     modal.appendChild(buttonsContainer);
-    container.appendChild(modal);  
+    container.appendChild(modal);
 
+    const backdrop = document.createElement('div');
+    backdrop.id = `${EXTENSION_NAME}-Modal-backdrop`;
+    const backdropStyles = {
+      'position': 'absolute',
+      'top': '0px',
+      'left': '0px',
+      'right': '0px',
+      'bottom': '0px',
+      'background-color': '#000',
+      'opacity': '50%',
+      'z-index': 500,
+    };
+    applyStyles(backdrop, backdropStyles);
+    container.appendChild(backdrop);
+    this.modal = modal;
+
+    this.clickOutsideListener = backdrop.addEventListener('click', (e: Event) => {
+      const target  = e.target as Element;
+      if (target === this.modal && target.closest(MODAL_WRAPPER)) {
+        console.log('inside');
+        return;
+      }
+      console.log('outside');
+      this.reset(this.container);
+      this.closeHandler();
+    });
+
+    
     return modal;
   }
 
   reset(container: HTMLElement): void {
     // remove modal
-    const elements = container.querySelectorAll(`#${EXTENSION_NAME}-Modal`);
+    const elements = container.querySelectorAll(`[id^=${EXTENSION_NAME}-Modal]`);
     Array.from(elements).forEach(element => container.removeChild(element));
+    this.modal = null;
   }
 
   async init(): Promise<void> {
     return checkElement(MODAL_WRAPPER).then(() => {
       const container = document.querySelector(MODAL_WRAPPER) as HTMLElement;
+      this.container = container;
       this.logger.log('[?]Modal', 'Mount');
       this.reset(container);
       this.mount(container);

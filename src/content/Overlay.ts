@@ -128,6 +128,15 @@ export class Overlay{
     );
 
     Array.from(inventoryPageTabs).forEach(tab => tab.addEventListener('click', debounce(this.render)));
+
+    const observer = new MutationObserver((mutationsList) => {
+      console.log(mutationsList);
+    });
+    observer.observe(container, {
+      attributes: true,
+      attributeFilter: ["style"],
+      subtree: true,
+    });
   }
 }
 
