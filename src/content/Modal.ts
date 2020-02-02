@@ -161,6 +161,9 @@ export class Modal {
     container.appendChild(backdrop);
     this.modal = modal;
 
+    const bodyStyles = { 'overflow-y': 'hidden' };
+    applyStyles(document.body, bodyStyles);
+
     this.clickOutsideListener = backdrop.addEventListener('click', (e: Event) => {
       const target  = e.target as Element;
       if (target === this.modal && target.closest(MODAL_WRAPPER)) {
@@ -181,6 +184,8 @@ export class Modal {
     const elements = container.querySelectorAll(`[id^=${EXTENSION_NAME}-Modal]`);
     Array.from(elements).forEach(element => container.removeChild(element));
     this.modal = null;
+    const bodyStyles = { 'overflow-y': 'unset' };
+    applyStyles(document.body, bodyStyles);
   }
 
   async init(): Promise<void> {

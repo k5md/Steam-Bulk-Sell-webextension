@@ -85,12 +85,6 @@ class SteamBulkSell {
     return itemData;
   }
 
-  sellHandler = async (): Promise<void> => {
-    const sellables = Object.values(this.items).filter(item => item.selected);
-    this.logger.log(JSON.stringify(sellables.map(({ marketHashName, price }) => ({ marketHashName, price })), null, 2), 'Sell');
-    return Promise.resolve();
-  }
-
   modalHandler = async (): Promise<void> => {
     const clearHandler = () => {
       this.items = {};
@@ -100,7 +94,13 @@ class SteamBulkSell {
 
     };
 
-    const modal = new Modal(this.logger, Object.values(this.items), this.sellHandler, closeHandler, clearHandler);
+    const sellHandler = async (): Promise<void> => {
+      const sellables = Object.values(this.items).filter(item => item.selected);
+      this.logger.log(JSON.stringify(sellables.map(({ marketHashName, price }) => ({ marketHashName, price })), null, 2), 'Sell');
+      return Promise.resolve();
+    };
+
+    const modal = new Modal(this.logger, Object.values(this.items), sellHandler, closeHandler, clearHandler);
     await modal.init();
   }
 
