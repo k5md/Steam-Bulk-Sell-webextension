@@ -20,33 +20,11 @@ export class Modal {
     private clickOutsideListener = null,
     private container = null,
     private modal = null,
+    private sellablesContainer = null,
+    private percentageModifier = '+0',
   ) {}
 
-  mount(container: HTMLElement): HTMLElement {
-    const modal = document.createElement('div');
-    const modalStyles = {
-      'position': 'fixed',
-      'z-index': '9000',
-      'top': '10%',
-      'bottom': '10%',
-      'left': '0',
-      'right': '0',
-      'margin': '0 25%',
-      'border': '1px solid #535353',
-      'background-color': '#3A3A3A',
-      'display': 'flex',
-      'flex-direction': 'column',
-      'justify-content': 'space-between',
-    };
-    modal.id = `${EXTENSION_NAME}-Modal`;
-    applyStyles(modal, modalStyles);
-
-    const sellablesContainer = document.createElement('div');
-    const sellablesContainerStyles = {
-      'overflow-y': 'auto',
-    };
-    applyStyles(sellablesContainer, sellablesContainerStyles);
-    
+  mountSellables(container: HTMLElement): Array<HTMLElement> {
     const sellables = this.items
       .filter(item => item.selected)
       .map(item => {
@@ -75,12 +53,20 @@ export class Modal {
         const nameElementStyles = {};
         applyStyles(nameElement, nameElementStyles);
 
-        const priceElement = document.createElement('div');
-        priceElement.textContent = price;
-        const priceElementStyles = {};
-        applyStyles(priceElement, priceElementStyles);
+        const priceContainer = document.createElement('div');
+        const priceContainerStyles = { 'display': 'inline-flex' };
+        applyStyles(priceContainer, priceContainerStyles);
+        const [ priceNumber, priceCurrency ] = price.split(' ');
+        const priceElement = document.createElement('input');
+        priceElement.type = 'text';
+        priceElement.pattern = '[0-9]+([\.,][0-9]{1,})?';
+        priceElement.value = priceNumber;
+        priceElement.disabled = true;
+        const currencyElement = document.createElement('div');
+        currencyElement.textContent = priceCurrency;
+        [ priceElement, currencyElement ].forEach(element => priceContainer.appendChild(element));
 
-        [ iconElement, nameElement, priceElement ].forEach(element => entry.appendChild(element));
+        [ iconElement, nameElement, priceContainer ].forEach(element => entry.appendChild(element));
 
         return entry;
       });
@@ -101,19 +87,48 @@ export class Modal {
       sellables.push(entry);
     }
 
-    sellables.forEach(entry => sellablesContainer.appendChild(entry));
+    sellables.forEach(entry => container.appendChild(entry));
+    return sellables;
+  }
 
+  handlePriceModifier(modifier: 'median' | 'percentage' | 'custom'): void {
+    switch (modifier) {
+      case 'median': {
+        this.sellablesContainer.innerHTML = '';
+        this.mountSellables(this.sellablesContainer);
+        break;
+      }
+      case 'percentage': {
+        this.sellablesContainer.innerHTML = '';
+        this.mountSellables(this.sellablesContainer);
+        const prices = this.sellablesContainer.querySelectorAll('input[type="text"]');
+        const modifier = parseFloat(this.percentageModifier.replace(',', '.'));
+        prices.forEach((price) => {
+          const value = parseFloat(price.value.replace(',', '.'));
+          const hasCommas = price.value.includes(',');
+          const modifiedValue = value + value * modifier / 100;
+          const renderedValue = modifiedValue > 0 ? modifiedValue : 0;
+          price.value = hasCommas ? String(renderedValue).replace('.', ',') : String(renderedValue);
+        });
+        break;
+      }
+      case 'custom': {
+        this.sellablesContainer.innerHTML = '';
+        this.mountSellables(this.sellablesContainer);
+        const prices = this.sellablesContainer.querySelectorAll('input[type="text"]');
+        prices.forEach((price) => {
+          price.disabled = false;
+          price.oninput = (e) => {
+            const replaced = e.target.value.replace('.', ',');
+            if (Number.isNaN(parseFloat(replaced))) e.target.value = 0;
+          };
+        });
+        break;
+      }
+    }
+  }
 
-    const buttonsContainer = document.createElement('div');
-    const buttonsContainerStyles = {
-      'display': 'flex',
-      'justify-content': 'space-evenly',
-      'background-color': '#181818',
-      'padding': '10px',
-      'align-items': 'center',
-    };
-    applyStyles(buttonsContainer, buttonsContainerStyles);
-
+  mountControls(container: HTMLElement): Array<HTMLElement> {
     const clearButton = document.createElement('input');
     clearButton.type = 'button';
     clearButton.value = browser.i18n.getMessage('modal_button_clear');
@@ -155,6 +170,7 @@ export class Modal {
     const medianRadiobutton = document.createElement('input');
     medianRadiobutton.type = 'radio';
     medianRadiobutton.name = priceModifierName;
+    medianRadiobutton.onchange = () => this.handlePriceModifier('median');
     medianRadiobutton.checked = true;
     [ medianRadiobutton, medianLabel ].forEach(element => median.appendChild(element));
 
@@ -164,12 +180,17 @@ export class Modal {
     const percentageRadiobutton = document.createElement('input');
     percentageRadiobutton.type = 'radio';
     percentageRadiobutton.name = priceModifierName;
+    percentageRadiobutton.onchange = () => this.handlePriceModifier('percentage');
     const percentageNumber = document.createElement('input');
     percentageNumber.type = 'text';
     percentageNumber.pattern = '[-|+][0-9]{1,3}';
     percentageNumber.size = 4;
     percentageNumber.maxLength = 4;
-    percentageNumber.value = '+10';
+    percentageNumber.value = this.percentageModifier;
+    percentageNumber.oninput = (e) => {
+      this.percentageModifier = (e.target as HTMLInputElement).value;
+      this.handlePriceModifier('percentage');
+    };
     const percentageNumberStyles = { 'padding-left': '10px', 'margin-left': '10px' };
     applyStyles(percentageNumber, percentageNumberStyles);
     [ percentageRadiobutton, percentageLabel, percentageNumber ].forEach(element => percentage.appendChild(element));
@@ -180,12 +201,53 @@ export class Modal {
     const customRadiobutton = document.createElement('input');
     customRadiobutton.type = 'radio';
     customRadiobutton.name = priceModifierName;
+    customRadiobutton.onchange = () => this.handlePriceModifier('custom');
     [ customRadiobutton, customLabel ].forEach(element => custom.appendChild(element));
 
-    [median, percentage, custom].forEach(element => priceModifiersContainer.appendChild(element));
+    [ median, percentage, custom ].forEach(element => priceModifiersContainer.appendChild(element));
 
+    [ priceModifiersContainer, clearButton, closeButton, sellButton ].forEach(button => container.appendChild(button));
+    return [ priceModifiersContainer, clearButton, closeButton, sellButton];
+  }
 
-    [ priceModifiersContainer, clearButton, closeButton, sellButton ].forEach(button => buttonsContainer.appendChild(button));
+  mount(container: HTMLElement): HTMLElement {
+    const modal = document.createElement('div');
+    const modalStyles = {
+      'position': 'fixed',
+      'z-index': '9000',
+      'top': '10%',
+      'bottom': '10%',
+      'left': '0',
+      'right': '0',
+      'margin': '0 25%',
+      'border': '1px solid #535353',
+      'background-color': '#3A3A3A',
+      'display': 'flex',
+      'flex-direction': 'column',
+      'justify-content': 'space-between',
+    };
+    modal.id = `${EXTENSION_NAME}-Modal`;
+    applyStyles(modal, modalStyles);
+
+    const sellablesContainer = document.createElement('div');
+    const sellablesContainerStyles = {
+      'overflow-y': 'auto',
+    };
+    applyStyles(sellablesContainer, sellablesContainerStyles);
+    
+    this.mountSellables(sellablesContainer);
+    this.sellablesContainer = sellablesContainer;
+
+    const buttonsContainer = document.createElement('div');
+    const buttonsContainerStyles = {
+      'display': 'flex',
+      'justify-content': 'space-evenly',
+      'background-color': '#181818',
+      'padding': '10px',
+      'align-items': 'center',
+    };
+    applyStyles(buttonsContainer, buttonsContainerStyles);
+    this.mountControls(buttonsContainer);
 
     modal.appendChild(sellablesContainer);
     modal.appendChild(buttonsContainer);
