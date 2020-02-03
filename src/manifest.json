@@ -14,7 +14,9 @@
     {
       "matches": [
         "https://steamcommunity.com/profiles/*/inventory/",
-        "http://steamcommunity.com/profiles/*/inventory/"
+        "http://steamcommunity.com/profiles/*/inventory/",
+        "https://steamcommunity.com/id/*/inventory/",
+        "http://steamcommunity.com/id/*/inventory/"
       ],
       "js": [
         "./content.js"
@@ -24,7 +26,9 @@
   ],
   "permissions": [
     "https://steamcommunity.com/profiles/*/inventory/",
-    "http://steamcommunity.com/profiles/*/inventory/"
+    "http://steamcommunity.com/profiles/*/inventory/",
+    "https://steamcommunity.com/id/*/inventory/",
+    "http://steamcommunity.com/id/*/inventory/"
   ],
   "icons": {
     "16": "./icons/16.png",

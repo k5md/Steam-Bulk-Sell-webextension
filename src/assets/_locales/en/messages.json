@@ -24,5 +24,25 @@
   "modal_button_sell": {
     "message": "Sell",
     "description": "Title for button used to confirm selling selected items in modal"
+  },
+
+  "modal_price_modifier_median": {
+    "message": "Median price (default)",
+    "description": "Title for radiobutton to use average price taken from steam price info for selling items"
+  },
+  
+  "modal_price_modifier_percentage": {
+    "message": "+/- percentage from median price",
+    "description": "Title for radiobutton to use (average price + percentage from it) for selling items"
+  },
+
+  "modal_price_modifier_custom": {
+    "message": "Custom price",
+    "description": "Title for radiobutton to use custom prices set by user for selling items"
+  },
+
+  "modal_price_total": {
+    "message": "You will get:",
+    "description": "Text prepended to total selected items price"
   }
 }

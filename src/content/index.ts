@@ -62,7 +62,7 @@ class SteamBulkSell {
       market_name: marketName,
       icon_url: iconUrl,
     } = descriptions.find(isItemDescription); // second we get raw marketHashName by classId
- 
+
     const {
       median_price: price,
       success: priceSuccess,
@@ -122,6 +122,13 @@ class SteamBulkSell {
   }
 
   async init(): Promise<void> {
+    const pageWindow = getOriginalWindow(window);
+    const { g_bMarketAllowed: marketAllowed } = pageWindow;
+
+    if (!marketAllowed) {
+      return;
+    }
+
     const logger = new Logger();
     await logger.init();
     this.logger = logger;

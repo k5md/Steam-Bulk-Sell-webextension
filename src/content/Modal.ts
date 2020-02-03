@@ -110,6 +110,7 @@ export class Modal {
       'justify-content': 'space-evenly',
       'background-color': '#181818',
       'padding': '10px',
+      'align-items': 'center',
     };
     applyStyles(buttonsContainer, buttonsContainerStyles);
 
@@ -139,7 +140,52 @@ export class Modal {
     sellButton.className = 'btn_darkblue_white_innerfade btn_medium';
     sellButton.onclick = this.sellHandler;
 
-    [ clearButton, closeButton, sellButton ].forEach(button => buttonsContainer.appendChild(button));
+
+    const priceModifiersContainer = document.createElement('div');
+    const priceModfiersContainerStyles = {
+      'padding': '10px',
+    };
+    applyStyles(priceModifiersContainer, priceModfiersContainerStyles);
+
+    const priceModifierName = 'priceModifier';
+    
+    const median = document.createElement('div');
+    const medianLabel = document.createElement('label');
+    medianLabel.textContent = browser.i18n.getMessage('modal_price_modifier_median');
+    const medianRadiobutton = document.createElement('input');
+    medianRadiobutton.type = 'radio';
+    medianRadiobutton.name = priceModifierName;
+    medianRadiobutton.checked = true;
+    [ medianRadiobutton, medianLabel ].forEach(element => median.appendChild(element));
+
+    const percentage = document.createElement('div');
+    const percentageLabel = document.createElement('label');
+    percentageLabel.textContent = browser.i18n.getMessage('modal_price_modifier_percentage');
+    const percentageRadiobutton = document.createElement('input');
+    percentageRadiobutton.type = 'radio';
+    percentageRadiobutton.name = priceModifierName;
+    const percentageNumber = document.createElement('input');
+    percentageNumber.type = 'text';
+    percentageNumber.pattern = '[-|+][0-9]{1,3}';
+    percentageNumber.size = 4;
+    percentageNumber.maxLength = 4;
+    percentageNumber.value = '+10';
+    const percentageNumberStyles = { 'padding-left': '10px', 'margin-left': '10px' };
+    applyStyles(percentageNumber, percentageNumberStyles);
+    [ percentageRadiobutton, percentageLabel, percentageNumber ].forEach(element => percentage.appendChild(element));
+
+    const custom = document.createElement('div');
+    const customLabel = document.createElement('label');
+    customLabel.textContent = browser.i18n.getMessage('modal_price_modifier_custom');
+    const customRadiobutton = document.createElement('input');
+    customRadiobutton.type = 'radio';
+    customRadiobutton.name = priceModifierName;
+    [ customRadiobutton, customLabel ].forEach(element => custom.appendChild(element));
+
+    [median, percentage, custom].forEach(element => priceModifiersContainer.appendChild(element));
+
+
+    [ priceModifiersContainer, clearButton, closeButton, sellButton ].forEach(button => buttonsContainer.appendChild(button));
 
     modal.appendChild(sellablesContainer);
     modal.appendChild(buttonsContainer);
@@ -172,8 +218,7 @@ export class Modal {
       this.reset(this.container);
       this.closeHandler();
     });
-
-    
+  
     return modal;
   }
 
