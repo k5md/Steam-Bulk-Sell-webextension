@@ -43,6 +43,14 @@ To monitor changes in browser with hot-reloading you can do
 - `npm run watch` or `make watch` to start rebuilding dist on every save in src directory. This is achieved via running webpack and web-ext both in watch mode with concurrently npm package. You can load extension in browser with `npm run browser` or `make browser`. 
 - Sometimes the above is not the best choice, since browser can stop reloading the extension rebuild due to errors, in this case you should avoid running webpack and web-ext in watch mode. If you want to monitor changes, you can just `npm run browser` once after first build-dev and then run build-dev on each change you want to inspect.
 
+## Todos
+
+- use vhtml jsx instead of tediously creating each element
+- refactor
+- change inventory caching logic
+- refactor this bs
+- refactor
+
 ## Credits
 
 Cart icon is made by [Freepic](https://www.flaticon.com/authors/freepik) from [Flaticon](https://www.flaticon.com/).
