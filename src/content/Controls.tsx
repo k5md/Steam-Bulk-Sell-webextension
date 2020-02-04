@@ -1,4 +1,5 @@
 import { checkElement, applyStyles } from '../utils';
+import h from '../jsx';
 import {
   EXTENSION_NAME,
   CONTROLS_WRAPPER,
@@ -27,7 +28,8 @@ export class Controls {
     applyStyles(sellButton, sellButtonStyles);
   
     controls.appendChild(sellButton);
-    container.appendChild(controls);      
+    container.appendChild(controls);  
+    
     return sellButton;
   }
 

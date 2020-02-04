@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -20,11 +19,6 @@ module.exports = {
   resolve: {
     modules: [SRC_DIR, 'node_modules'],
     extensions: ['.js', '.json', '.ts', '.tsx'],
-    alias: {
-      'react': 'preact/compat',
-      'react-dom/test-utils': 'preact/test-utils',
-      'react-dom': 'preact/compat',
-    },
   },
   module: {
     rules: [
@@ -84,15 +78,16 @@ module.exports = {
         ],
       },
       {
-        test: /\.(js|ts)x?$/, // TYPESCRIPT
+        test: /\.(js|jsx|ts|tsx)$/, // TYPESCRIPT
         use: [
-          {
-            loader: 'cache-loader',
-          },
           {
             loader: 'ts-loader',
             options: {
               transpileOnly: false,
+              compilerOptions: {
+                jsx: 'react',
+                jsxFactory: 'h',
+              }
             },
           },
         ],

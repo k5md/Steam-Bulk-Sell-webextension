@@ -16,4 +16,10 @@ declare global {
   let browser: any;
 }
 
+declare namespace JSX {
+  interface IntrinsicElements {
+      [elemName: string]: any;
+  }
+}
+
 declare const PRODUCTION: boolean;

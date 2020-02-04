@@ -22,6 +22,7 @@ export class Modal {
     private modal = null,
     private sellablesContainer = null,
     private percentageModifier = '+0',
+    private total = '0',
   ) {}
 
   mountSellables(container: HTMLElement): Array<HTMLElement> {
@@ -50,7 +51,11 @@ export class Modal {
 
         const nameElement = document.createElement('div');
         nameElement.textContent = marketName;
-        const nameElementStyles = {};
+        const nameElementStyles = {
+          'text-overflow': 'ellipsis',
+          'overflow': 'hidden',
+          'white-space': 'nowrap',
+        };
         applyStyles(nameElement, nameElementStyles);
 
         const priceContainer = document.createElement('div');
@@ -61,7 +66,9 @@ export class Modal {
         priceElement.type = 'text';
         priceElement.pattern = '[0-9]+([\.,][0-9]{1,})?';
         priceElement.value = priceNumber;
-        priceElement.disabled = true;
+        priceElement.readOnly = true;
+        priceElement.oninput = () => { this.sellablesContainer.innerHTML = ''; this.mountSellables(this.sellablesContainer); };
+
         const currencyElement = document.createElement('div');
         currencyElement.textContent = priceCurrency;
         [ priceElement, currencyElement ].forEach(element => priceContainer.appendChild(element));
@@ -88,6 +95,24 @@ export class Modal {
     }
 
     sellables.forEach(entry => container.appendChild(entry));
+
+    const divider = document.createElement('div');
+    divider.classList.add('market_dialog_content_separator');
+    const dividerStyles = { 'width': '100%' };
+    applyStyles(divider, dividerStyles);
+    const total = document.createElement('div');
+
+    const totalPrice = sellables.reduce((acc, cur) => {
+      const input = cur.querySelector('input[type="text"]');
+      const price = parseFloat((input as HTMLInputElement).value.replace(',', '.'));
+      return acc + price;
+    }, 0);
+    const hasCommas = sellables.map(s => s.querySelector('input[type="text"]')).some(price => (price as HTMLInputElement).value.includes(','));
+    total.textContent = hasCommas ? String(totalPrice).replace('.', ',') : String(totalPrice);
+
+    container.appendChild(divider);
+    container.appendChild(total);
+
     return sellables;
   }
 
@@ -117,7 +142,7 @@ export class Modal {
         this.mountSellables(this.sellablesContainer);
         const prices = this.sellablesContainer.querySelectorAll('input[type="text"]');
         prices.forEach((price) => {
-          price.disabled = false;
+          price.readOnly = false;
           price.oninput = (e) => {
             const replaced = e.target.value.replace('.', ',');
             if (Number.isNaN(parseFloat(replaced))) e.target.value = 0;
