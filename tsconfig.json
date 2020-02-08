@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "outDir": "./dist/",
     "sourceMap": true,
     "module": "ESNext",
@@ -14,10 +15,11 @@
     "paths": {
       "src/*": ["./src/*"]
     },
-    "lib": ["es6", "es7", "dom", "esnext"]
+    "lib": [ "es6", "es7", "dom", "esnext" ]
   },
   "include": [
-    "**/src/**/*.ts"
+    "**/src/**/*.tsx",
+    "**/src/**/*.ts",
   ],
   "exclude": ["dist", "build", "node_modules"]
 }

@@ -1,5 +1,5 @@
 import { uniqueId, debounce } from 'lodash';
-import { applyStyles, checkElement, checkElements } from '../utils';
+import { applyStyles, checkElement, checkElements } from '../../utils';
 import {
   EXTENSION_NAME,
   INVENTORIES_WRAPPER,
@@ -10,9 +10,9 @@ import {
   NEXT_INVENTORY_PAGE,
   INVENTORY_PAGE_TABS,
   FILTER_OPTIONS,
-} from './constants';
+} from '../constants';
 
-export class Overlay{
+export class OverlayWrapper {
   constructor(
     private logger: { log: Function } = console,
     private toggleHandler: (itemId: string, checked: boolean) => Promise<void> = (): Promise<void> => Promise.resolve(),
@@ -148,4 +148,4 @@ export class Overlay{
   }
 }
 
-export default Overlay;
+export default OverlayWrapper;

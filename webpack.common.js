@@ -4,6 +4,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+const JSXJS = path.resolve(__dirname, 'src/jsx.js');
 const DIST_DIR = path.resolve(__dirname, 'dist');
 const SRC_DIR = path.resolve(__dirname, 'src');
 
@@ -78,16 +79,12 @@ module.exports = {
         ],
       },
       {
-        test: /\.(js|jsx|ts|tsx)$/, // TYPESCRIPT
+        test: /\.(ts|tsx)$/, // TYPESCRIPT
         use: [
           {
             loader: 'ts-loader',
             options: {
               transpileOnly: false,
-              compilerOptions: {
-                jsx: 'react',
-                jsxFactory: 'h',
-              }
             },
           },
         ],

@@ -12,12 +12,8 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.6.0",
     "@typescript-eslint/parser": "^2.6.0",
-    "babel-loader": "^8.0.6",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-jsx": "^2.0.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
     "cache-loader": "^4.1.0",
+    "classnames": "^2.2.6",
     "concurrently": "^4.1.2",
     "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.2.0",
@@ -34,7 +30,6 @@
     "style-loader": "^1.0.0",
     "ts-loader": "^6.2.0",
     "typescript": "^3.6.3",
-    "vhtml": "^2.2.0",
     "web-ext": "^3.2.0",
     "webextension-polyfill": "^0.2.1",
     "webpack": "^4.41.2",
@@ -42,6 +37,8 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "mithril": "^2.0.4"
+    "@types/react": "^16.9.19",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
   }
 }

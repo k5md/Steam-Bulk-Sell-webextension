@@ -1,0 +1,5 @@
+.logger__container {
+  height: 100px;
+  overflow-y: scroll;
+  word-wrap: break-word;
+}

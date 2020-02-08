@@ -1,0 +1,41 @@
+.modal_sell__items {
+  overflow-y: auto;
+}
+
+.modal_sell__controls {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: #181818;
+  padding: 10px;
+  align-items: center;
+}
+
+.modal_sell__price_modifier {
+  padding: 10px;
+}
+
+.modal_sell__percentage_number {
+  padding-left: 10px;
+  margin-left: 10px
+}
+
+.modal_sell__divider {
+  width: 100%;
+}
+
+.modal_items__entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px;
+}
+
+.modal_items__total {
+
+}
+
+.modal_items__empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
