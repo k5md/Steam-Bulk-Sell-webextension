@@ -1,5 +1,10 @@
 /** Global definitions for developement **/
 
+declare module "*.scss" {
+  const content: { [className: string]: string };
+  export = content;
+}
+
 export {}
 declare global {
   interface Window {
@@ -8,9 +13,4 @@ declare global {
   let XPCNativeWrapper: any;
   let browser: any;
   const PRODUCTION: boolean;
-}
-
-declare module "*.scss" {
-  const content: { [className: string]: string };
-  export = content;
 }

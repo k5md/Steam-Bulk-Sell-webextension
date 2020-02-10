@@ -37,7 +37,6 @@ module.exports = {
             }
           },
         ],
-        
       },
       {
         test: /\.s[ac]ss$/i, // SCSS

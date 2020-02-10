@@ -14,8 +14,8 @@ import {
 
 export class OverlayWrapper {
   constructor(
-    private logger: { log: Function } = console,
-    private toggleHandler: (itemId: string, checked: boolean) => Promise<void> = (): Promise<void> => Promise.resolve(),
+    public logs = [],
+    public toggleHandler: (itemId: string, checked: boolean) => Promise<void> = (): Promise<void> => Promise.resolve(),
     public overlayContainer: HTMLElement = null,
   ) {}
 
@@ -35,7 +35,7 @@ export class OverlayWrapper {
     checkbox.onchange = async (e): Promise<void> => {
       const target = e.target as HTMLInputElement;
       if (!target.previousSibling) {
-        this.logger.log(`Previous sibling is null`, 'Error');
+        this.logs.push({ tag: 'Error', message: '[X] Previous sibling is null' });
         return;
       }
       const itemElement = target.previousSibling as HTMLElement;
@@ -53,7 +53,7 @@ export class OverlayWrapper {
     return checkbox;
   }
 
-  mount(container: HTMLElement): Array<HTMLElement> { 
+  mount = (container: HTMLElement): Array<HTMLElement> => { 
     //TODO: make use of pages in g_ActiveInventory, since it would allow for filtering sellable/not sellable items
     // inventory wrapper contains #inventory_steamid_appid_contextid for every app,
     // inactive of them have style.display set to none
@@ -70,7 +70,7 @@ export class OverlayWrapper {
   /**
    * Removes only not visible DOM nodes created by an Overlay instance
    */
-  clear(container: HTMLElement): void {
+  clear = (container: HTMLElement): void => { 
     // NOTE: there are two cases for disabled elements:
     // 1. #inventory_steamid_appid_contextid with style.display set to none
     // 2. .inventory_page with style.display set to none
@@ -85,7 +85,7 @@ export class OverlayWrapper {
 
     checkboxes.forEach(checkbox => {
       if (!container || !container.contains(checkbox)) {
-        this.logger.log('Can not clear checkbox', 'Error');
+        this.logs.push({ tag: 'Error', message: '[X] Can not clear checkbox' });
         throw new Error();
       }
       checkbox.parentNode.removeChild(checkbox);
@@ -95,19 +95,18 @@ export class OverlayWrapper {
   /**
    * Removes all DOM nodes created by an Overlay instance
    */
-  reset(container: HTMLElement): void {
+  reset = (container: HTMLElement): void => { 
     const elements = container.querySelectorAll(`[id^=${EXTENSION_NAME}-Overlay]`);
     Array.from(elements).forEach(element => element.parentElement.removeChild(element));
   }
 
   render = (): void => {
-    this.logger.log('[?]Overlay', 'Render');
     this.clear(this.overlayContainer);
     this.mount(this.overlayContainer);
-    this.logger.log('[✓]Overlay', 'Render');
+    this.logs.push({ tag: 'Render', message: '[✓]Overlay' });
   }
 
-  async init(): Promise<void> {
+  init = async (): Promise<void> => {
     const container = await checkElement(INVENTORIES_WRAPPER) as HTMLElement;
     this.overlayContainer = container;
     this.render();

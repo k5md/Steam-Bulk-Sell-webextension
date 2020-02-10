@@ -10,6 +10,10 @@
   align-items: center;
 }
 
+.modal_sell__buttons {
+  display: contents;
+}
+
 .modal_sell__price_modifier {
   padding: 10px;
 }
@@ -38,4 +42,18 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
+}
+
+.modal_items__entry_flex {
+  display: flex;
+}
+
+.modal_items__entry_inline_flex {
+  display: inline-flex;
+}
+
+.modal_items__entry_ellipsized {
+  text-overflow: 'ellipsis';
+  overflow: 'hidden';
+  white-space: 'nowrap';
 }

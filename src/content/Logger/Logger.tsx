@@ -1,7 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import * as styles from './index.css';
+const styles = require('./index.scss');
+import { observer } from "mobx-react";
 
-export const Logger = ({ logs }) => {
+export const Logger = observer(({ logs, id }) => {
   const loggerRef = useRef(null);
 
   useEffect(() => {
@@ -9,12 +10,12 @@ export const Logger = ({ logs }) => {
   }, [logs]);
 
   return (
-    <div style={styles.logger__container} ref={loggerRef}>
+    <div id={id} className={styles.logger__container} ref={loggerRef}>
       {logs.map(({ tag, message }) => (
         <pre>{`[${tag}]: ${message}`}</pre>
       ))}
     </div>
   );
-};
+});
 
 export default Logger;

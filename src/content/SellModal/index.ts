@@ -1,2 +1,2 @@
-import SellModal from './SellModal';
+import { SellModal } from './SellModal';
 export { SellModal };

@@ -1,20 +1,143 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal } from '../Modal';
-import { SellModalControls } from './SellModalControls';
-import { SellModalItems } from './SellModalItems';
-import * as styles from './index.css';
-import { BUTTON_SECONDARY } from 'content/constants';
+const styles = require('./index.scss');
+import { BUTTON_SECONDARY, BUTTON_PRIMARY } from 'content/constants';
+import { ICON_URL } from 'content/API';
 
 export const SellModal = ({
-  onSell,
-  onClose,
-  onClear,
+  id,
+  sellHandler,
+  closeHandler,
+  clearHandler,
   items,
-  percentageModifier = '+0',
-  total = '0',
-}) => (
-  <Modal>
-    <SellModalItems />
-    <SellModalControls />
-  </Modal>
-);
+}) => {
+
+  const [ open, toggle ] = useState(true);
+
+  const [ derivativeItems, setDerivativeItems ] = useState(items);
+  // const replaced = e.target.value.replace('.', ',');
+  // if (Number.isNaN(parseFloat(replaced))) e.target.value = 0;
+  const makeHandlePriceChange = targetIndex => e => setDerivativeItems(
+    derivativeItems.map((item, itemIndex) => itemIndex !== targetIndex ? item : { ...item, price: e.target.value })
+  );
+
+  const [ priceModifier, setPriceModifier ] = useState('median');
+  const handlePriceModifierChange = e => setPriceModifier(e.target.value);
+
+  const [ percentageModifier, setPercentageModifier ] = useState('+0');
+  const percentageModifierNumber = Number.isNaN(parseFloat(percentageModifier)) ? 0 : parseFloat(percentageModifier);
+  const handlePercentageModifierChange = e => setPercentageModifier(e.target.value);
+
+  const renderedItems = derivativeItems.map(({ iconUrl, marketName, priceValue, priceCurrency }, index) => {
+    const width = '96f';
+    const height = '96f';
+    const src = `${ICON_URL}/${iconUrl}/${width}x${height}`;
+
+    const price = parseFloat(priceValue);
+    const verifiedPrice = Number.isNaN(price) ? 0 : price;
+    const modifiedPrice = priceModifier === 'percentage'
+      ? verifiedPrice + verifiedPrice * percentageModifierNumber / 100
+      : verifiedPrice
+    const renderedPrice = modifiedPrice > 0 ? modifiedPrice : 0;
+    
+    return (
+      <div className={styles.modal_items__entry}>
+        <div className={styles.modal_items__entry_flex}>
+          <img src={src} />
+        </div>
+        <div className={styles.modal_items__entry_ellipsized}>{marketName}</div>
+        <div className={styles.modal_items__entry_inline_flex}>
+          <input
+            type="text"
+            pattern="[0-9]+([\.,][0-9]{1,})?"
+            value={renderedPrice}
+            readOnly={priceModifier === 'custom'}
+            onInput={makeHandlePriceChange(index)}
+          />
+          <div>{priceCurrency}</div>
+        </div>
+      </div>
+    );
+  });
+
+  const emptyItems = (
+    <div className={styles.modal_items__empty}>
+      {browser.i18n.getMessage('modal_items_empty')}
+    </div>
+  );
+
+  return (
+    <Modal open={open} id={id}>
+      <div className={styles.modal_sell__items}>
+        {renderedItems.length ? renderedItems : emptyItems}
+        <div className={styles.modal_sell__divider}></div>
+        <div className={styles.modal_items__total}>
+          {derivativeItems.reduce((acc, cur) => acc + cur.priceValue, 0)}
+        </div>     
+      </div>
+      <div className={styles.modal_sell__controls}>
+        <div className={styles.modal_sell__price_modifier}>
+          <div>
+            <label>{browser.i18n.getMessage('modal_price_modifier_median')}</label>
+            <input
+              type="radio"
+              name="priceModifier"
+              value="median"
+              onChange={handlePriceModifierChange}
+              checked={priceModifier === 'median'}
+            />
+          </div>
+          <div>
+            <label>{browser.i18n.getMessage('modal_price_modifier_percentage')}</label>
+            <input
+              type="radio"
+              name="priceModifier"
+              value="percentage"
+              onChange={handlePriceModifierChange}
+              checked={priceModifier === 'percentage'}
+            />
+            <input
+              type="text"
+              pattern="[-|+][0-9]{1,3}"
+              size={4}
+              maxLength={4}
+              value={percentageModifier}
+              onInput={handlePercentageModifierChange}
+              className={styles.modal_sell__percentage_number}
+            />
+          </div>
+          <div>
+            <label>{browser.i18n.getMessage('modal_price_modifier_custom')}</label>
+            <input
+              type="radio"
+              name="priceModifier"
+              value="custom"
+              onChange={handlePriceModifierChange}
+              checked={priceModifier === 'custom'}
+            />
+          </div>
+        </div>
+        <div className={styles.modal_sell__buttons}>
+          <input
+            type="button" 
+            value={browser.i18n.getMessage('modal_button_clear')}
+            className={BUTTON_SECONDARY}
+            onClick={(...args) => clearHandler(...args)}
+          />
+          <input
+            type="button"
+            value={browser.i18n.getMessage('modal_button_close')}
+            className={BUTTON_SECONDARY}
+            onClick={(...args) => { toggle(false); closeHandler(...args); }}
+          />
+          <input
+            type="button"
+            value={browser.i18n.getMessage('modal_button_sell')}
+            className={BUTTON_PRIMARY}
+            onClick={() => { toggle(false); sellHandler(derivativeItems); }}
+          />
+        </div>
+      </div>
+    </Modal>
+  );
+};

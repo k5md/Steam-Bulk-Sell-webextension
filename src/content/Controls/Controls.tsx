@@ -1,8 +1,8 @@
 import React from 'react';
 import { BUTTON_PRIMARY } from '../constants';
 
-export const Controls = ({ sellHandler }) => (
-  <div>
+export const Controls = ({ sellHandler, id }) => (
+  <div id={id}>
     <input
       type="button"
       onClick={sellHandler}

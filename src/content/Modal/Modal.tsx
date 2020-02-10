@@ -1,12 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import * as styles from './index.css';
+const styles = require('./index.scss');
 
-export const Modal = ({
-  open,
-  onOpen,
-  onClose,
-  children,
-}) => {
+export const Modal = (props) => {
+  const {
+    id,
+    open,
+    onOpen = () => {},
+    onClose = () => {},
+    children = [],
+  } = props;
+  
   useEffect(onOpen, []);
 
   const modalRef = useRef(null);
@@ -18,8 +21,10 @@ export const Modal = ({
     onClose();
   };
 
+  console.log('render modal', props);
+
   return open && (
-    <div>
+    <div id={id}>
       <div className={styles.modal__container} ref={modalRef}>
         {children}
       </div>
