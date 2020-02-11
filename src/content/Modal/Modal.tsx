@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-const styles = require('./index.scss');
+import styles from './index.scss';
 
 export const Modal = (props) => {
   const {

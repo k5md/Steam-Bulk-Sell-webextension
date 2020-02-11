@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-const styles = require('./index.scss');
+import styles from './index.scss';
 import { observer } from "mobx-react";
 
 export const Logger = observer(({ logs, id }) => {

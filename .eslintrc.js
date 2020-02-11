@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "eslint-plugin-react"],
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -15,7 +15,8 @@ module.exports = {
     sourceType: 'module', // Allows for the use of imports
   },
   rules: {
-
+    "react/jsx-uses-react": 1,
+    "react/jsx-uses-vars": 1,
   },
   settings:  {
     react:  {

@@ -42,6 +42,7 @@ module.exports = {
         test: /\.s[ac]ss$/i, // SCSS
         use: [
           MiniCssExtractPlugin.loader,
+          { loader: '@teamsupercell/typings-for-css-modules-loader' },
           {
             loader: 'css-loader',
             options: {

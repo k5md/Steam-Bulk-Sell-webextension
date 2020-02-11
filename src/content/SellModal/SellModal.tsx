@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../Modal';
-const styles = require('./index.scss');
+import styles from './index.scss';
 import { BUTTON_SECONDARY, BUTTON_PRIMARY } from 'content/constants';
 import { ICON_URL } from 'content/API';
 
