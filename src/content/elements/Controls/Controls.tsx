@@ -1,7 +1,7 @@
 import React from 'react';
-import { BUTTON_PRIMARY } from '../constants';
+import { BUTTON_PRIMARY } from '../../constants';
 
-export const Controls = ({ sellHandler, id }) => (
+export const Controls = ({ id, sellHandler }) => (
   <div id={id}>
     <input
       type="button"
@@ -11,6 +11,6 @@ export const Controls = ({ sellHandler, id }) => (
       style={{ marginTop: '10px', }}
     />
   </div>
-)
+);
 
 export default Controls;

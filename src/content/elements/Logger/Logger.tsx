@@ -1,13 +1,12 @@
 import React, { useRef, useEffect } from 'react';
 import styles from './index.scss';
-import { observer } from "mobx-react";
 
-export const Logger = observer(({ logs, id }) => {
+export const Logger = ({ id, logs }) => {
   const loggerRef = useRef(null);
 
   useEffect(() => {
     loggerRef.current.scrollTop = loggerRef.current.scrollHeight; // automatically scroll to the bottom
-  }, [logs]);
+  }, [ logs ]);
 
   return (
     <div id={id} className={styles.logger__container} ref={loggerRef}>
@@ -16,6 +15,6 @@ export const Logger = observer(({ logs, id }) => {
       ))}
     </div>
   );
-});
+};
 
 export default Logger;

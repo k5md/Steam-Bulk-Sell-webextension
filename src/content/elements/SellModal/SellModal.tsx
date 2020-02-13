@@ -10,10 +10,8 @@ export const SellModal = ({
   closeHandler,
   clearHandler,
   items,
+  open,
 }) => {
-
-  const [ open, toggle ] = useState(true);
-
   const [ derivativeItems, setDerivativeItems ] = useState(items);
   // const replaced = e.target.value.replace('.', ',');
   // if (Number.isNaN(parseFloat(replaced))) e.target.value = 0;
@@ -122,19 +120,19 @@ export const SellModal = ({
             type="button" 
             value={browser.i18n.getMessage('modal_button_clear')}
             className={BUTTON_SECONDARY}
-            onClick={(...args) => clearHandler(...args)}
+            onClick={clearHandler}
           />
           <input
             type="button"
             value={browser.i18n.getMessage('modal_button_close')}
             className={BUTTON_SECONDARY}
-            onClick={(...args) => { toggle(false); closeHandler(...args); }}
+            onClick={closeHandler}
           />
           <input
             type="button"
             value={browser.i18n.getMessage('modal_button_sell')}
             className={BUTTON_PRIMARY}
-            onClick={() => { toggle(false); sellHandler(derivativeItems); }}
+            onClick={() => sellHandler(derivativeItems)}
           />
         </div>
       </div>

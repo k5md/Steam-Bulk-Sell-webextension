@@ -1,27 +1,23 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import { EXTENSION_NAME, APP_LOGO } from '../constants';
-import { Controls } from '../Controls';
-import { Logger } from '../Logger';
+import { CONTROLS_WRAPPER, EXTENSION_NAME, APP_LOGO, INVENTORY_PAGE_TABS, } from '../constants';
+import { ControlsContainer } from '../elements';
+import { store } from '../stores';
+import { checkElement, checkElements } from '../../utils';
+const { inventory, logger } = store;
 
-export class ControlsLoggerWrapper {
+export class ControlsWrapper {
   constructor(
-    public sellHandler: () => void = (): void => {},
-    public logs = [],
     public container = null,
+    public fragment = null,
+    public wrapper = null,
   ) {}
 
-  mount = (): void => {
-    const wrapper = (
-      <React.Fragment>
-        <Logger id={`${EXTENSION_NAME}-Logger`} logs={this.logs} />
-        <Controls id={`${EXTENSION_NAME}-Controls`} sellHandler={this.sellHandler} />
-      </React.Fragment>
-    );
-    const fragment = document.createElement('div');
-
-    ReactDOM.render(wrapper, fragment);
-    this.container.appendChild(fragment);
+  mount = () => {
+    this.wrapper = (<ControlsContainer />);
+    this.fragment = document.createDocumentFragment();
+    ReactDOM.render(this.wrapper, this.fragment);
+    this.container.appendChild(this.fragment);
   }
 
   resetContainerStyles = (): void => {
@@ -48,11 +44,18 @@ export class ControlsLoggerWrapper {
   }
 
   init = (): void => {
-    this.reset();
-    this.mount();
-    this.watchContainerStyles();
-    this.logs.push({ tag: 'Mount', message: '[✓]Controls'});
+    checkElement(CONTROLS_WRAPPER).then((container) => {
+      this.container = container;
+      this.reset();
+      this.mount();
+      this.watchContainerStyles();
+    });
+
+    checkElements(INVENTORY_PAGE_TABS).then((inventoryPageTabs) => {
+      const { clearItems } = inventory;
+      Array.from(inventoryPageTabs).forEach(tab => tab.addEventListener('click', clearItems));
+    });
   }
 }
 
-export default ControlsLoggerWrapper;
+export default ControlsWrapper;
