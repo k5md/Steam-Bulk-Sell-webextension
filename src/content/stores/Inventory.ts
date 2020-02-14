@@ -1,13 +1,16 @@
 import { observable, action, computed } from 'mobx';
 import { getInventory, getPrice } from '../API';
 import { getOriginalWindow } from '../../utils'; // TODO: move it from mobx store to components
+import { store } from './';
+
+const log = (entry) => store.logger.log(entry);
 
 export class Inventory {
   @observable inventory = {}
   @observable items = {}
   @observable selling = false
 
-  @action async selectItem(itemId: string, selected: boolean): Promise<void> {
+  @action.bound async selectItem(itemId: string, selected: boolean): Promise<void> {
     const [ appId, contextId, assetId ] = itemId.split('_');
 
     if (!Object.keys(this.items).includes(itemId)) {
@@ -16,10 +19,10 @@ export class Inventory {
     }
  
     this.items[itemId].selected = selected;
-    // this.logs.push({ tag: 'Selected', message: JSON.stringify(this.items[itemId], null, '  ') });
+    log({ tag: 'Selected', message: JSON.stringify(this.items[itemId], null, '  ') });
   }
 
-  @action async fetchInventory(
+  @action.bound async fetchInventory(
     steamId: string | number,
     appId: string | number,
     contextId: string | number,
@@ -33,7 +36,7 @@ export class Inventory {
     } = await getInventory(steamId, appId, contextId, countryCode, itemsCount).then(response => response.json());
   
     if (!inventorySuccess) {
-      // this.logs.push({ tag: 'Error', message: '[X] Inventory request failed' });
+      log({ tag: 'Error', message: '[X] Inventory request failed' });
       return;
     }
   
@@ -41,7 +44,7 @@ export class Inventory {
     this.inventory[cacheKey] = { assets, descriptions };
   }
 
-  @action async findItem(appId: string, contextId: string, assetId: string): Promise<object>{
+  @action.bound async findItem(appId: string, contextId: string, assetId: string): Promise<object> {
     const pageWindow = getOriginalWindow(window);
     const {
       g_strCountryCode: countryCode,
@@ -73,7 +76,7 @@ export class Inventory {
       success: priceSuccess,
     } = await getPrice(countryCode, currencyId, appId, encodeURIComponent(marketHashName)).then(response => response.json());
     if (!priceSuccess) {
-      // this.logs.push({ tag: 'Error', message: '[X] Inventory description lookup failed' });
+      log({ tag: 'Error', message: '[X] Inventory description lookup failed' });
       return;
     }
   
@@ -83,7 +86,7 @@ export class Inventory {
       assetId,
       marketHashName: encodeURIComponent(marketHashName),
       currencyId,
-      priceValue: price.split(' ')[0],
+      priceValue: price.split(' ')[0].replace(',', '.'),
       priceCurrency: price.split(' ')[1],
       marketName,
       iconUrl,
@@ -92,7 +95,7 @@ export class Inventory {
     return itemData;
   }
 
-  @action clearItems() {
+  @action clearItems = () => {
     this.items = {};
   }
 
@@ -100,10 +103,9 @@ export class Inventory {
     return Object.values(this.items).filter((item: any) => item.selected);
   }
 
-  @action sellItems() {}
+  @action sellItems = () => {}
 
-  @action setSelling(value) {
-    console.log(value);
-    this.selling = value;
+  @action toggleSelling = () => {
+    this.selling = !this.selling;
   }
 }

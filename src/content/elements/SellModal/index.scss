@@ -1,5 +1,6 @@
 .modal_sell__items {
   overflow-y: auto;
+  flex-grow: 9000;
 }
 
 .modal_sell__controls {
@@ -24,7 +25,12 @@
 }
 
 .modal_sell__divider {
-  width: 100%;
+  border-bottom: 1px solid grey;
+  margin: 10px;
+
+  &:before {
+    content: '';
+  }
 }
 
 .modal_items__entry {
@@ -34,8 +40,10 @@
   margin: 10px;
 }
 
-.modal_items__total {
+.modal_sell__total {
   display: flex;
+  justify-content: end;
+  padding: 0 10px;
 }
 
 .modal_items__empty {

@@ -12,7 +12,6 @@ import {
   FILTER_OPTIONS,
 } from '../constants';
 import { store } from '../stores';
-import { Logger } from 'content/elements';
 
 const { inventory: { selectItem }, logger: { log } } = store;
 
@@ -30,7 +29,7 @@ export class OverlayWrapper {
       && !item.getElementsByTagName('input').length; // NOTE: <- this particular check is for already mounted checkboxes
   }
 
-  mountCheckbox = (): HTMLElement => {
+  mountCheckbox = (container: HTMLElement): HTMLElement => {
     const checkbox = document.createElement('input');
     checkbox.id = `${EXTENSION_NAME}-Overlay-${uniqueId()}`;
     checkbox.type = 'checkbox';
@@ -54,7 +53,7 @@ export class OverlayWrapper {
     };
     applyStyles(checkbox, checkboxStyles);
 
-    this.container.appendChild(checkbox);
+    container.appendChild(checkbox);
     return checkbox;
   }
 

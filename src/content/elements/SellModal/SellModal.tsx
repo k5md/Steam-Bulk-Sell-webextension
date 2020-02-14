@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../Modal';
 import styles from './index.scss';
 import { BUTTON_SECONDARY, BUTTON_PRIMARY } from 'content/constants';
@@ -13,8 +13,20 @@ export const SellModal = ({
   open,
 }) => {
   const [ derivativeItems, setDerivativeItems ] = useState(items);
+
+  useEffect(() => {
+    setDerivativeItems(items);
+  }, [ items ]);
   // const replaced = e.target.value.replace('.', ',');
   // if (Number.isNaN(parseFloat(replaced))) e.target.value = 0;
+
+  const [ total, setTotal ] = useState(0);
+
+  useEffect(() => {
+    setTotal(derivativeItems.reduce((acc, cur) => acc + parseFloat(cur.priceValue), 0));
+  }, [ derivativeItems ]);
+  
+
   const makeHandlePriceChange = targetIndex => e => setDerivativeItems(
     derivativeItems.map((item, itemIndex) => itemIndex !== targetIndex ? item : { ...item, price: e.target.value })
   );
@@ -47,9 +59,9 @@ export const SellModal = ({
         <div className={styles.modal_items__entry_inline_flex}>
           <input
             type="text"
-            pattern="[0-9]+([\.,][0-9]{1,})?"
+            pattern="[0-9]+([\.][0-9]{1,})?"
             value={renderedPrice}
-            readOnly={priceModifier === 'custom'}
+            readOnly={priceModifier !== 'custom'}
             onInput={makeHandlePriceChange(index)}
           />
           <div>{priceCurrency}</div>
@@ -65,13 +77,13 @@ export const SellModal = ({
   );
 
   return (
-    <Modal open={open} id={id}>
+    <Modal open={open} id={id} onClose={closeHandler}>
       <div className={styles.modal_sell__items}>
-        {renderedItems.length ? renderedItems : emptyItems}
-        <div className={styles.modal_sell__divider}></div>
-        <div className={styles.modal_items__total}>
-          {derivativeItems.reduce((acc, cur) => acc + cur.priceValue, 0)}
-        </div>     
+        {renderedItems.length ? renderedItems : emptyItems}  
+      </div>
+      <div className={styles.modal_sell__divider}></div>
+      <div className={styles.modal_sell__total}>
+        <p>{total}</p>
       </div>
       <div className={styles.modal_sell__controls}>
         <div className={styles.modal_sell__price_modifier}>

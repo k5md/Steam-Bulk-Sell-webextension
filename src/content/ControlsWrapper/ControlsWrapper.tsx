@@ -15,7 +15,7 @@ export class ControlsWrapper {
 
   mount = () => {
     this.wrapper = (<ControlsContainer />);
-    this.fragment = document.createDocumentFragment();
+    this.fragment = document.createElement('div');
     ReactDOM.render(this.wrapper, this.fragment);
     this.container.appendChild(this.fragment);
   }
@@ -25,6 +25,7 @@ export class ControlsWrapper {
     appLogo.style.display = 'none'; // hide application logo
 
     this.container.style.height = 'unset'; // remove fixed 69px height for wrapper
+    this.container.style.paddingTop = '0px';
   }
 
   watchContainerStyles = (): void => {
@@ -35,10 +36,10 @@ export class ControlsWrapper {
 
   reset = (): void => {
     const controls = this.container.querySelectorAll(`#${EXTENSION_NAME}-Controls`);
-    controls.forEach(element => this.container.removeChild(element)); // remove existing controls
+    controls.forEach(element => element.parent.removeChild(element)); // remove existing controls
 
     const loggers = this.container.querySelectorAll(`#${EXTENSION_NAME}-Logger`);
-    loggers.forEach(element => this.container.removeChild(element)); // remove the existing loggers
+    loggers.forEach(element => element.parent.removeChild(element)); // remove the existing loggers
 
     this.resetContainerStyles();
   }
