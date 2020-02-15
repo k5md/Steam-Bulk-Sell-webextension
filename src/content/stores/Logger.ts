@@ -1,10 +1,10 @@
-import { observable, action } from 'mobx'
+import { observable, action } from 'mobx';
+import { uniqueId } from 'lodash';
 
 export class Logger {
   @observable logs = []
 
   @action log = (entry) => {
-    console.log('added log entry');
-    this.logs.push(entry);
+    this.logs.push({ ...entry, id: uniqueId()});
   }
 }

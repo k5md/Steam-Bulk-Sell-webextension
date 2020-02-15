@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Modal } from '../Modal';
 import styles from './index.scss';
 import { BUTTON_SECONDARY, BUTTON_PRIMARY } from 'content/constants';
-import { ICON_URL } from 'content/API';
 
 export const SellModal = ({
   id,
@@ -11,64 +10,30 @@ export const SellModal = ({
   clearHandler,
   items,
   open,
+  handlePriceModifierChange,
+  percentageModifier,
+  priceModifier,
+  handlePercentageModifierChange,
+  makeHandlePriceChange,
 }) => {
-  const [ derivativeItems, setDerivativeItems ] = useState(items);
-
-  useEffect(() => {
-    setDerivativeItems(items);
-  }, [ items ]);
-  // const replaced = e.target.value.replace('.', ',');
-  // if (Number.isNaN(parseFloat(replaced))) e.target.value = 0;
-
-  const [ total, setTotal ] = useState(0);
-
-  useEffect(() => {
-    setTotal(derivativeItems.reduce((acc, cur) => acc + parseFloat(cur.priceValue), 0));
-  }, [ derivativeItems ]);
-  
-
-  const makeHandlePriceChange = targetIndex => e => setDerivativeItems(
-    derivativeItems.map((item, itemIndex) => itemIndex !== targetIndex ? item : { ...item, price: e.target.value })
-  );
-
-  const [ priceModifier, setPriceModifier ] = useState('median');
-  const handlePriceModifierChange = e => setPriceModifier(e.target.value);
-
-  const [ percentageModifier, setPercentageModifier ] = useState('+0');
-  const percentageModifierNumber = Number.isNaN(parseFloat(percentageModifier)) ? 0 : parseFloat(percentageModifier);
-  const handlePercentageModifierChange = e => setPercentageModifier(e.target.value);
-
-  const renderedItems = derivativeItems.map(({ iconUrl, marketName, priceValue, priceCurrency }, index) => {
-    const width = '96f';
-    const height = '96f';
-    const src = `${ICON_URL}/${iconUrl}/${width}x${height}`;
-
-    const price = parseFloat(priceValue);
-    const verifiedPrice = Number.isNaN(price) ? 0 : price;
-    const modifiedPrice = priceModifier === 'percentage'
-      ? verifiedPrice + verifiedPrice * percentageModifierNumber / 100
-      : verifiedPrice
-    const renderedPrice = modifiedPrice > 0 ? modifiedPrice : 0;
-    
-    return (
-      <div className={styles.modal_items__entry}>
-        <div className={styles.modal_items__entry_flex}>
-          <img src={src} />
-        </div>
-        <div className={styles.modal_items__entry_ellipsized}>{marketName}</div>
-        <div className={styles.modal_items__entry_inline_flex}>
-          <input
-            type="text"
-            pattern="[0-9]+([\.][0-9]{1,})?"
-            value={renderedPrice}
-            readOnly={priceModifier !== 'custom'}
-            onInput={makeHandlePriceChange(index)}
-          />
-          <div>{priceCurrency}</div>
-        </div>
+  const renderedItems = items.map(({ marketName, priceValue, priceCurrency, src }, index) => (
+    <div className={styles.modal_items__entry} key={index}>
+      <div className={styles.modal_items__entry_flex}>
+        <img src={src} />
       </div>
-    );
-  });
+      <div className={styles.modal_items__entry_ellipsized}>{marketName}</div>
+      <div className={styles.modal_items__entry_inline_flex}>
+        <input
+          type="text"
+          pattern="[0-9]+([\.][0-9]{1,})?"
+          value={priceValue}
+          readOnly={priceModifier !== 'custom'}
+          onInput={makeHandlePriceChange(index)}
+        />
+        <div>{priceCurrency}</div>
+      </div>
+    </div>
+  ));
 
   const emptyItems = (
     <div className={styles.modal_items__empty}>
@@ -76,13 +41,16 @@ export const SellModal = ({
     </div>
   );
 
+  const total = items.reduce((acc, cur) => acc + parseFloat(cur.priceValue), 0)
+
   return (
     <Modal open={open} id={id} onClose={closeHandler}>
       <div className={styles.modal_sell__items}>
-        {renderedItems.length ? renderedItems : emptyItems}  
+        {renderedItems.length ? renderedItems : emptyItems}
       </div>
       <div className={styles.modal_sell__divider}></div>
       <div className={styles.modal_sell__total}>
+        <p>{browser.i18n.getMessage('modal_items_total')}</p>
         <p>{total}</p>
       </div>
       <div className={styles.modal_sell__controls}>
@@ -144,7 +112,7 @@ export const SellModal = ({
             type="button"
             value={browser.i18n.getMessage('modal_button_sell')}
             className={BUTTON_PRIMARY}
-            onClick={() => sellHandler(derivativeItems)}
+            onClick={() => sellHandler(items)}
           />
         </div>
       </div>

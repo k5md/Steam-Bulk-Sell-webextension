@@ -44,5 +44,10 @@
   "modal_price_total": {
     "message": "You will get:",
     "description": "Text prepended to total selected items price"
+  },
+
+  "modal_items_empty": {
+    "message": "No items selected",
+    "description": "Text displayed in modal when no items were selected to be sold"
   }
 }
