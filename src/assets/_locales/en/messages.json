@@ -42,8 +42,14 @@
   },
 
   "modal_price_total": {
-    "message": "You will get:",
-    "description": "Text prepended to total selected items price"
+    "message": "You will get: $SUM$",
+    "description": "Total selected items price",
+    "placeholders": {
+      "sum" : {
+        "content" : "$1",
+        "example" : "1256.7"
+      }
+    }
   },
 
   "modal_items_empty": {

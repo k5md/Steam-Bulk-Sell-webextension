@@ -1,13 +1,14 @@
 import { observable, action, computed } from 'mobx';
 import { getInventory, getPrice } from '../API';
-import { getOriginalWindow } from '../../utils'; // TODO: move it from mobx store to components
+import { getOriginalWindow } from '../../utils'; // TODO: move it from mobx store to components?
 
 export class Inventory {
-  @observable inventory = {}
-  @observable items = {}
-  @observable selling = false
+  @observable inventory = {} // holds all items in two arrays: assets and descriptions
+  @observable items = {} // contains items from inventory with which user has interacted
+  @observable selling = false // show selling modal
 
   constructor(public rootStore) {}
+
 
   @action.bound async fetchInventory(
     steamId: string,
@@ -20,7 +21,7 @@ export class Inventory {
       assets,
       descriptions,
       success: inventorySuccess,
-    } = await getInventory(steamId, appId, contextId, countryCode, itemsCount).then(response => response.json());
+    } = await getInventory(steamId, appId, contextId, countryCode, itemsCount);
   
     if (!inventorySuccess) {
       this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory request failed' });
@@ -31,24 +32,9 @@ export class Inventory {
     this.inventory[cacheKey] = { assets, descriptions };
   }
 
-
-  @action toggleSelling = () => {
-    this.selling = !this.selling;
-  }
-
-  @action.bound async select(itemId: string, selected: boolean): Promise<void> {
+  @action.bound async find(itemId: string): Promise<object> {
     const [ appId, contextId, assetId ] = itemId.split('_');
 
-    if (!Object.keys(this.items).includes(itemId)) {
-      const itemData = await this.find(appId, contextId, assetId);
-      this.items[itemId] = { ...itemData };
-    }
- 
-    this.items[itemId].selected = selected;
-    this.rootStore.logger.log({ tag: 'Selected', message: JSON.stringify(this.items[itemId], null, '  ') });
-  }
-
-  @action.bound async find(appId: string, contextId: string, assetId: string): Promise<object> {
     const pageWindow = getOriginalWindow(window);
     const {
       g_strCountryCode: countryCode,
@@ -66,12 +52,10 @@ export class Inventory {
     const isAsset = (item): boolean => String(item.appid) === appId
       && item.contextid === contextId
       && item.assetid === assetId;
-  
     const { classid: classId } = assets.find(isAsset); // first we get classId from assets array
 
     const isDescription = (item): boolean => String(item.appid) === appId
       && item.classid === classId;
-
     const {
       market_hash_name: marketHashName,
       market_name: marketName,
@@ -81,13 +65,14 @@ export class Inventory {
     const {
       median_price: price,
       success: priceSuccess,
-    } = await getPrice(countryCode, currencyId, appId, encodeURIComponent(marketHashName)).then(response => response.json());
+    } = await getPrice(countryCode, currencyId, appId, encodeURIComponent(marketHashName));
     if (!priceSuccess) {
       this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory description lookup failed' });
-      return;
+      return Promise.reject();
     }
   
     const itemData = {
+      cacheKey,
       appId,
       contextId,
       assetId,
@@ -102,8 +87,22 @@ export class Inventory {
     return itemData;
   }
 
+  @action.bound async select(itemId: string, selected: boolean): Promise<void> {
+    if (!Object.keys(this.items).includes(itemId)) {
+      const itemData = await this.find(itemId);
+      this.items[itemId] = { ...itemData };
+    }
+ 
+    this.items[itemId].selected = selected;
+    this.rootStore.logger.log({ tag: 'Selected', message: JSON.stringify(this.items[itemId], null, '  ') });
+  }
+
   @action clear = () => {
     this.items = {};
+  }
+
+  @action toggleSelling = () => {
+    this.selling = !this.selling;
   }
 
   @computed get selected() {

@@ -16,8 +16,8 @@ export const SellModal = ({
   handlePercentageModifierChange,
   makeHandlePriceChange,
 }) => {
-  const renderedItems = items.map(({ marketName, priceValue, priceCurrency, src }, index) => (
-    <div className={styles.modal_items__entry} key={index}>
+  const renderedItems = items.map(({ marketName, priceValue, priceCurrency, src, cacheKey }, index) => (
+    <div className={styles.modal_items__entry} key={cacheKey}>
       <div className={styles.modal_items__entry_flex}>
         <img src={src} />
       </div>
@@ -37,7 +37,7 @@ export const SellModal = ({
 
   const emptyItems = (
     <div className={styles.modal_items__empty}>
-      {browser.i18n.getMessage('modal_items_empty')}
+      <p>{browser.i18n.getMessage('modal_items_empty')}</p>
     </div>
   );
 
@@ -50,8 +50,7 @@ export const SellModal = ({
       </div>
       <div className={styles.modal_sell__divider}></div>
       <div className={styles.modal_sell__total}>
-        <p>{browser.i18n.getMessage('modal_items_total')}</p>
-        <p>{total}</p>
+        <p>{browser.i18n.getMessage('modal_price_total', total)}</p>
       </div>
       <div className={styles.modal_sell__controls}>
         <div className={styles.modal_sell__price_modifier}>

@@ -11,7 +11,7 @@ export const Logger = ({ id, children }) => {
   return (
     <div id={id} className={styles.logger__container} ref={loggerRef}>
       {children.map(({ tag, message, id }) => (
-        <pre id={id}>{`[${tag}]: ${message}`}</pre>
+        <pre key={id}>{`[${tag}]: ${message}`}</pre>
       ))}
     </div>
   );

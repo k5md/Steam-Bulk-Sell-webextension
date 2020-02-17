@@ -10,21 +10,20 @@ export const getInventory = (
   contextId: string,
   countryCode: string,
   itemsCount: string,
-): Promise<Response> => {
+): Promise<Record<string, any>> => {
   const path = [ INVENTORY_URL, steamId, appId, contextId ].join('/');
   const search = new URLSearchParams({
     l: countryCode,
     count: itemsCount,
   });
   const url = `${path}/?${search}`;
-  console.log(url)
   const requestConfig: RequestInit = {
     method: 'GET',
     cache: 'default',
     mode: 'same-origin',
     credentials: 'same-origin',
   };
-  return fetch(url, requestConfig);
+  return fetch(url, requestConfig).then(response => response.json());
 };
 
 export const getPrice = (
@@ -32,7 +31,7 @@ export const getPrice = (
   currencyId: string,
   appId: string,
   marketHashName: string,
-): Promise<Response> => {
+): Promise<Record<string, any>> => {
   // NOTE: do not use urlsearchparams here since it escapes markethashname yielding incorrect string
   const url = `${PRICE_URL}/?country=${countryCode}&currency=${currencyId}&appid=${appId}&market_hash_name=${marketHashName}`;
   const requestConfig: RequestInit = {
@@ -40,17 +39,17 @@ export const getPrice = (
     cache: 'no-cache',
     mode: "cors",
   };
-  return fetch(url, requestConfig);
+  return fetch(url, requestConfig).then(response => response.json());
 };
 
 export const sellItem = (
-  sessionId: string | number,
-  appId: string | number,
-  contextId: string | number,
-  assetId: string | number,
-  amount: string | number = 1,
-  price: string | number,
-): Promise<Response> => {
+  sessionId: string,
+  appId: string,
+  contextId: string,
+  assetId: string,
+  price: string,
+  amount = '1',
+): Promise<Record<string, any>> => {
   const requestData = {
     sessionid: sessionId,
     appid: appId,
@@ -65,8 +64,11 @@ export const sellItem = (
     mode: 'cors',
     body: JSON.stringify(requestData),
   };
-  return fetch(SELL_URL, requestConfig);
+  return fetch(SELL_URL, requestConfig).then(response => response.json());
 };
 
-export const getIconUrl = (relativeIconUrl, width = '96f', height = '96f') =>
-  `${ICON_URL}/${relativeIconUrl}/${width}x${height}`;
+export const getIconUrl = (
+  relativeIconUrl: string,
+  width = '96f',
+  height = '96f',
+): string => `${ICON_URL}/${relativeIconUrl}/${width}x${height}`;
