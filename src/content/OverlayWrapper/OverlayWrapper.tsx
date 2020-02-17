@@ -1,5 +1,5 @@
 import { uniqueId, debounce } from 'lodash';
-import { applyStyles, checkElement, checkElements } from '../../utils';
+import { checkElement, checkElements } from '../../utils';
 import {
   EXTENSION_NAME,
   INVENTORIES_WRAPPER,
@@ -11,6 +11,7 @@ import {
   INVENTORY_PAGE_TABS,
   FILTER_OPTIONS,
 } from '../constants';
+import styles from './index.scss';
 import { store } from '../stores';
 
 const { inventory: { select }, logger: { log } } = store;
@@ -30,30 +31,30 @@ export class OverlayWrapper {
   }
 
   mountCheckbox = (container: HTMLElement): HTMLElement => {
-    const checkbox = document.createElement('input');
-    checkbox.id = `${EXTENSION_NAME}-Overlay-${uniqueId()}`;
-    checkbox.type = 'checkbox';
-    checkbox.checked = false;
-    // TODO: consider making onchange handler lighter
+    const label = document.createElement('label');
+    label.id = `${EXTENSION_NAME}-Overlay-${uniqueId()}`;
+    label.className = styles.container;
+    const checkmark = document.createElement('span');
+    checkmark.className = styles.checkmark;
 
-    checkbox.onchange = async (e): Promise<void> => {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    // TODO: consider making onchange handler lighter
+    label.onclick = async (e): Promise<void> => {
       const target = e.target as HTMLInputElement;
-      if (!target.previousSibling) {
+      if (!target.parentElement.previousSibling) {
         log({ tag: 'Error', message: '[X] Previous sibling is null' });
         return;
       }
-      const itemElement = target.previousSibling as HTMLElement;
+      const itemElement = target.parentElement.previousSibling as HTMLElement;
       const itemId = itemElement.id;
       await select(itemId, target.checked);
     };
-    const checkboxStyles = {
-      'position': 'absolute',
-      'top': '0px',
-      'zIndex': '2',
-    };
-    applyStyles(checkbox, checkboxStyles);
 
-    container.appendChild(checkbox);
+    label.appendChild(checkbox);
+    label.appendChild(checkmark);
+    container.appendChild(label);
+
     return checkbox;
   }
 

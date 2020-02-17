@@ -1,0 +1,47 @@
+.container {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  user-select: none;
+}
+
+.container input {
+  position: absolute;
+  opacity: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 16px;
+  width: 16px;
+  background: linear-gradient( to bottom, rgba(47,137,188,1) 5%, rgba(23,67,92,1) 95%);
+  border: 1px solid black;
+  border-radius: 2px;
+  border-left: 0px;
+  border-top: 0px;
+}
+
+.container:hover input ~ .checkmark {
+  background: linear-gradient( to bottom, rgba(102,192,244,1) 5%, rgba(47,137,188,1) 95%);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.container .checkmark:after {
+  content: '✓';
+  left: 2px;
+  top: -2px;
+  color: white;
+}
