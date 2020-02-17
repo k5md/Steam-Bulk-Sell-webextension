@@ -13,7 +13,7 @@ import {
 } from '../constants';
 import { store } from '../stores';
 
-const { inventory: { selectItem }, logger: { log } } = store;
+const { inventory: { select }, logger: { log } } = store;
 
 export class OverlayWrapper {
   constructor(
@@ -44,7 +44,7 @@ export class OverlayWrapper {
       }
       const itemElement = target.previousSibling as HTMLElement;
       const itemId = itemElement.id;
-      await selectItem(itemId, target.checked);
+      await select(itemId, target.checked);
     };
     const checkboxStyles = {
       'position': 'absolute',
@@ -75,7 +75,7 @@ export class OverlayWrapper {
   /**
    * Removes only not visible DOM nodes created by an Overlay instance
    */
-  clear = (): void => { 
+  reset = (): void => { 
     // NOTE: there are two cases for disabled elements:
     // 1. #inventory_steamid_appid_contextid with style.display set to none
     // 2. .inventory_page with style.display set to none
@@ -97,18 +97,9 @@ export class OverlayWrapper {
     });
   }
 
-  /**
-   * Removes all DOM nodes created by an Overlay instance
-   */
-  reset = (): void => { 
-    const elements = this.container.querySelectorAll(`[id^=${EXTENSION_NAME}-Overlay]`);
-    Array.from(elements).forEach(element => element.parentElement.removeChild(element));
-  }
-
   render = (): void => {
-    this.clear();
+    this.reset();
     this.mount();
-    log({ tag: 'Render', message: '[✓]Overlay' });
   }
 
   init = async (): Promise<void> => {
@@ -137,7 +128,7 @@ export class OverlayWrapper {
     );
     
     // why? because filters could make visible items from not yet loaded pages
-    // why mutationobserver? because checkElements won't work because of weird way filters are created
+    // why mutationobserver? because checkElements won't work because of the way filters are created
     const filtersContainer = document.querySelector(FILTER_OPTIONS);
     const observer = new MutationObserver(() => {
       const checkboxes = filtersContainer.querySelectorAll('input[type="checkbox"');
@@ -150,6 +141,7 @@ export class OverlayWrapper {
       subtree: true,
       childList: true,
     });
+    log({ tag: 'Init', message: '[✓] Overlay' });
   }
 }
 

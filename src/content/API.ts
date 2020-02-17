@@ -1,16 +1,23 @@
+/* eslint-disable @typescript-eslint/camelcase */
 export const INVENTORY_URL = 'https://steamcommunity.com/inventory';
 export const PRICE_URL = 'https://steamcommunity.com/market/priceoverview';
 export const SELL_URL = 'https://steamcommunity.com/market/sellitem';
 export const ICON_URL = 'https://steamcommunity-a.akamaihd.net/economy/image';
 
 export const getInventory = (
-  steamId: string | number,
-  appId: string | number,
-  contextId: string | number,
+  steamId: string,
+  appId: string,
+  contextId: string,
   countryCode: string,
-  itemsCount: string | number,
+  itemsCount: string,
 ): Promise<Response> => {
-  const url = `${INVENTORY_URL}/${steamId}/${appId}/${contextId}?l=${countryCode}&count=${itemsCount}`;
+  const path = [ INVENTORY_URL, steamId, appId, contextId ].join('/');
+  const search = new URLSearchParams({
+    l: countryCode,
+    count: itemsCount,
+  });
+  const url = `${path}/?${search}`;
+  console.log(url)
   const requestConfig: RequestInit = {
     method: 'GET',
     cache: 'default',
@@ -22,10 +29,11 @@ export const getInventory = (
 
 export const getPrice = (
   countryCode: string,
-  currencyId: string | number,
-  appId: string | number,
+  currencyId: string,
+  appId: string,
   marketHashName: string,
 ): Promise<Response> => {
+  // NOTE: do not use urlsearchparams here since it escapes markethashname yielding incorrect string
   const url = `${PRICE_URL}/?country=${countryCode}&currency=${currencyId}&appid=${appId}&market_hash_name=${marketHashName}`;
   const requestConfig: RequestInit = {
     credentials: "include",
@@ -59,3 +67,6 @@ export const sellItem = (
   };
   return fetch(SELL_URL, requestConfig);
 };
+
+export const getIconUrl = (relativeIconUrl, width = '96f', height = '96f') =>
+  `${ICON_URL}/${relativeIconUrl}/${width}x${height}`;

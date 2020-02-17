@@ -1,23 +1,26 @@
 import React, { useState, useEffect }  from 'react';
 import { observer } from 'mobx-react';
 import { SellModal } from '../';
-import { useStores } from 'content/stores';
-import { ICON_URL } from 'content/API';
+import { useInventory } from 'content/stores';
+import { getIconUrl } from 'content/API';
 
 export const SellModalContainer = observer(({ id }) => {
-  const { inventory } = useStores();
   const {
-    selectedItems,
-    clearItems,
-    sellItems,
+    selected,
+    clear,
+    sell,
     toggleSelling,
     selling,
-  } = inventory;
+  } = useInventory();
 
   const clearHandler = () => {
-    clearItems();
+    clear();
     toggleSelling();
   };
+
+  useEffect(() => {
+    document.body.style.overflowY = selling ? 'hidden' : 'revert';
+  }, [ selling ])
 
   const [ derivativeItems, setDerivativeItems ] = useState([]);
 
@@ -34,11 +37,9 @@ export const SellModalContainer = observer(({ id }) => {
   console.log('render smc', derivativeItems);
 
   useEffect(() => {
-    const newDerivativeItems = selectedItems.map((item: any) => {
+    const newDerivativeItems = selected.map((item: any) => {
       const { iconUrl, priceValue } = item;
-      const width = '96f';
-      const height = '96f';
-      const src = `${ICON_URL}/${iconUrl}/${width}x${height}`;
+      const src = getIconUrl(iconUrl);
     
       const percentageModifierNumber = Number.isNaN(parseFloat(percentageModifier)) ? 0 : parseFloat(percentageModifier);
       const price = parseFloat(priceValue);
@@ -54,12 +55,12 @@ export const SellModalContainer = observer(({ id }) => {
       };
     });
     setDerivativeItems(newDerivativeItems);
-  }, [ selectedItems, priceModifier, percentageModifier ]);
+  }, [ selected, priceModifier, percentageModifier ]);
 
   return (
     <SellModal
       id={id}
-      sellHandler={sellItems}
+      sellHandler={sell}
       closeHandler={toggleSelling}
       clearHandler={clearHandler}
       items={derivativeItems}
