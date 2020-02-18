@@ -15,7 +15,7 @@ module.exports = {
   },
   entry: {
     content: './src/content/index.ts',
-    popup: './src/popup/index.ts',
+    popup: './src/popup/index.tsx',
   },
   resolve: {
     modules: [SRC_DIR, 'node_modules'],

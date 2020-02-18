@@ -55,5 +55,42 @@
   "modal_items_empty": {
     "message": "No items selected",
     "description": "Text displayed in modal when no items were selected to be sold"
+  },
+
+
+  "guide_purpose": {
+    "message": "Selling one card at a time may be very time consuming, this extension enhances Steam web-version inventory to allow mass item selling",
+    "description": "Message, clarifying extension purpose"
+  },
+
+  "guide_run_0": {
+    "message": "To use the extension navigate to:",
+    "description": "Parts of the message clarifying how to use the extension"
+  },
+
+  "guide_run_link_profile": {
+    "message": "https://steamcommunity.com/profiles/YOUR PROFILE ID/inventory/"
+  },
+
+  "guide_run_link_id": {
+    "message": "https://steamcommunity.com/id/YOUR USER ID/inventory/"
+  },
+
+  "guide_run_1": {
+    "message": "Select cards you want to sell then click the button"
+  },
+
+  "guide_run_2": {
+    "message": "A modal will appear, listing all selected items. You can modify desired sell price using radiobuttons and input fields. Once you are done, press the 'Sell' button to confirm."
+  },
+
+  "guide_issues_information": {
+    "message": "Should you encounter a bug or have any suggestions on how to improve the extension",
+    "description": "First part of the message, telling users where to address if they want to contact the dev on related issues"
+  },
+
+  "guide_issues_link": {
+    "message": "create a new issue on github",
+    "description": "Second part of the message, link text"
   }
 }
