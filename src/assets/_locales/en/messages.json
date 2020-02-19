@@ -77,11 +77,7 @@
   },
 
   "guide_run_1": {
-    "message": "Select cards you want to sell then click the button"
-  },
-
-  "guide_run_2": {
-    "message": "A modal will appear, listing all selected items. You can modify desired sell price using radiobuttons and input fields. Once you are done, press the 'Sell' button to confirm."
+    "message": "Select cards you want to sell then click the 'Sell selected items' button. A modal will appear, listing all selected items. You can modify desired sell price using radiobuttons and input fields. Once you are done, press the 'Sell' button to confirm."
   },
 
   "guide_issues_information": {
