@@ -17,6 +17,7 @@ export class ControlsWrapper extends BaseWrapper {
     appLogo.style.display = 'none'; // hide application logo
 
     this.container.style.height = 'unset'; // remove fixed 69px height for wrapper
+    this.container.style.maxHeight = 'unset'; // on mobile screens maxHeight gets limited as well
     this.container.style.paddingTop = '0px';
   }
 
