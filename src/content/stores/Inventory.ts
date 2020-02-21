@@ -6,9 +6,9 @@ export class Inventory {
   @observable inventory = {} // holds all items in two arrays: assets and descriptions
   @observable items = {} // contains items from inventory with which user has interacted
   @observable selling = false // show selling modal
+  onClearHandlers = {}
 
   constructor(public rootStore) {}
-
 
   @action.bound async fetchInventory(
     steamId: string,
@@ -99,6 +99,7 @@ export class Inventory {
 
   @action clear = () => {
     this.items = {};
+    Object.values(this.onClearHandlers).forEach((handler: Function) => handler());
   }
 
   @action toggleSelling = () => {

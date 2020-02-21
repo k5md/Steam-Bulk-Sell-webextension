@@ -6,14 +6,14 @@ import { BaseWrapper } from '../BaseWrapper';
 import { Checkbox } from '../elements';
 import { store } from '../stores';
 
-const { inventory: { select, clear }, logger: { log } } = store;
+const { inventory: { select, onClearHandlers }, logger: { log } } = store;
 
 export class OverlayWrapper extends BaseWrapper {
   constructor() {
     super();
   }
 
-  createElement = (itemHolder: HTMLElement): void => {
+  createElement = (itemHolder): void => {
     const { id: itemId } = itemHolder.firstChild as HTMLElement;
     const clickHandler = checked => select(itemId, checked);
 
@@ -39,20 +39,28 @@ export class OverlayWrapper extends BaseWrapper {
         .filter(({ addedNodes }) => addedNodes.length && (addedNodes[0] as Element).classList.contains('itemHolder'))
         .forEach(({ addedNodes }) => this.createElement(addedNodes[0]))
       );
-
       const addedPage = new MutationObserver(mutationsList => mutationsList
         .filter(({ addedNodes }) => addedNodes.length && (addedNodes[0] as Element).classList.contains('inventory_page'))
         .forEach(({ addedNodes }) => addedNodes[0].childNodes.forEach(this.createElement))
       );
-
       const changedItems = new MutationObserver(mutationsList => mutationsList
         .filter(({ target }) => (target as Element).classList.contains('item'))
         .forEach(({ target }) => this.createElement(target.parentNode))
       );
+      
+      [addedItems, addedPage, changedItems ].forEach((observer) => {
+        observer.observe(this.container, { childList: true, subtree: true });
+        this.disposers.push(() => observer.disconnect());
+      });
 
-      [ addedItems, addedPage, changedItems ].forEach(
-        observer => observer.observe(this.container, { childList: true, subtree: true })
-      );
+      onClearHandlers['overlayWrapper'] = () => {
+        this.reset();
+        this.mount();
+        [addedItems, addedPage, changedItems ].forEach((observer) => {
+          observer.observe(this.container, { childList: true, subtree: true });
+          this.disposers.push(() => observer.disconnect());
+        });
+      };
 
       log({ tag: 'Init', message: '[✓] Overlay' });
     });
