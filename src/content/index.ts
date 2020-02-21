@@ -6,9 +6,9 @@ import { EXTENSION_NAME } from './constants';
 
 class SteamBulkSell {
   constructor(
-    public overlay: OverlayWrapper = null,
-    public controls: ControlsWrapper = null,
-    public sellModal: SellModalWrapper = null,
+    public overlay: OverlayWrapper =  new OverlayWrapper(),
+    public controls: ControlsWrapper = new ControlsWrapper(),
+    public sellModal: SellModalWrapper = new SellModalWrapper(),
   ) {}
 
    async init(): Promise<void> {
@@ -21,13 +21,8 @@ class SteamBulkSell {
     const stales = document.querySelectorAll(`[id^=${EXTENSION_NAME}`);
     stales.forEach(element => element.parentElement.removeChild(element));
 
-    this.overlay = new OverlayWrapper();
     this.overlay.init();
-
-    this.controls = new ControlsWrapper();
     this.controls.init();
-
-    this.sellModal = new SellModalWrapper();
     this.sellModal.init();
   }
 }
