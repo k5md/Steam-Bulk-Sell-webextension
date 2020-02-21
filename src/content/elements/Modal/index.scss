@@ -11,6 +11,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  @media screen and (min-width: 768px) and (max-width: 991px) {
+    font-size: 10px,
+  }
 }
 
 .modal__backdrop {

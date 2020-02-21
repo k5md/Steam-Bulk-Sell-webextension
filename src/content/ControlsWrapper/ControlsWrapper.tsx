@@ -1,6 +1,6 @@
 import React from 'react';
 import { CONTROLS_WRAPPER, APP_LOGO, INVENTORY_PAGE_TABS, } from '../constants';
-import { checkElement, checkElements } from '../../utils';
+import { checkElement, checkElements, applyStyles } from '../../utils';
 import { BaseWrapper } from '../BaseWrapper';
 import { ControlsContainer } from '../elements';
 import { store } from '../stores';
@@ -14,28 +14,34 @@ export class ControlsWrapper extends BaseWrapper {
 
   resetContainerStyles = (): void => {
     const appLogo: HTMLElement = this.container.querySelector(APP_LOGO);
-    appLogo.style.display = 'none'; // hide application logo
-
-    this.container.style.height = 'unset'; // remove fixed 69px height for wrapper
-    this.container.style.maxHeight = 'unset'; // on mobile screens maxHeight gets limited as well
-    this.container.style.paddingTop = '0px';
+    applyStyles(appLogo, { display: 'none' }); // hide application logo
+    applyStyles(this.container, {
+      height: 'unset', // remove fixed 69px height for wrapper a
+      maxHeight: 'unset', // on mobile screens maxHeight gets limited as well
+      paddingTop: '0',
+    });
   }
 
-  watchContainerStyles = (): MutationObserver => {
+  watchContainerStyles = (): Function => {
     const appLogo: HTMLElement = this.container.querySelector(APP_LOGO);
     const observer = new MutationObserver(this.resetContainerStyles);
     observer.observe(appLogo, { attributeFilter: ['src'] });
-    return observer;
+    return () => observer.disconnect();
+  }
+
+  onReset = (): void => {
+    this.resetContainerStyles();
+  }
+
+  onMount = (): void => {
+    this.disposers.push(this.watchContainerStyles());
   }
 
   init = (): void => {
-    checkElement(CONTROLS_WRAPPER).then((container) => {
+    checkElement(CONTROLS_WRAPPER).then((container: HTMLElement) => {
       this.container = container;
-      this.elements.push(<ControlsContainer />);
-      this.reset();
-      this.resetContainerStyles();
-      this.mount();
-      this.disposers.push(this.watchContainerStyles());
+      this.elements = [{ element: <ControlsContainer /> }];
+      this.render();   
       log({ tag: 'Init', message: '[✓] Controls' });
     });
 

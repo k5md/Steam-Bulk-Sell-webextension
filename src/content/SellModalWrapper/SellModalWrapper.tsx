@@ -13,11 +13,10 @@ export class SellModalWrapper extends BaseWrapper {
   }
 
   init = (): void => {
-    checkElement(MODAL_WRAPPER).then((container) => {
+    checkElement(MODAL_WRAPPER).then((container: HTMLElement) => {
       this.container = container;
-      this.elements.push(<SellModalContainer id={`${EXTENSION_NAME}-Modal`} />)
-      this.reset();
-      this.mount();
+      this.elements = [{ element: <SellModalContainer id={`${EXTENSION_NAME}-Modal`} /> }];
+      this.render();
       log({ tag: 'Init', message: '[✓] Modal wrapper' });
     });
   }
