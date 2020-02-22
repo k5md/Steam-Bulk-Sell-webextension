@@ -1,38 +1,19 @@
-import { observable, action, computed } from 'mobx';
+import { observable, action } from 'mobx';
 import { getInventory, getPrice } from '../API';
 import { getOriginalWindow } from '../../utils'; // TODO: move it from mobx store to components?
+import { Items } from './Items';
+import { Item, ItemConstructorParameter } from './Item';
 
 export class Inventory {
   @observable inventory = {} // holds all items in two arrays: assets and descriptions
-  @observable items = {} // contains items from inventory with which user has interacted
+  @observable items: Items // contains items from inventory with which user has interacted
   @observable selling = false // show selling modal
-  onClearHandlers = {}
 
-  constructor(public rootStore) {}
-
-  @action.bound async fetchInventory(
-    steamId: string,
-    appId: string,
-    contextId: string,
-    countryCode: string,
-    itemsCount: string,
-  ): Promise<void> {
-    const {
-      assets,
-      descriptions,
-      success: inventorySuccess,
-    } = await getInventory(steamId, appId, contextId, countryCode, itemsCount);
-  
-    if (!inventorySuccess) {
-      this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory request failed' });
-      return;
-    }
-  
-    const cacheKey = [steamId, appId, contextId, countryCode].join('_');
-    this.inventory[cacheKey] = { assets, descriptions };
+  constructor(public rootStore) {
+    this.items = new Items(rootStore);
   }
 
-  @action.bound async find(itemId: string): Promise<object> {
+  @action.bound async fetch(itemId: string): Promise<ItemConstructorParameter> {
     const [ appId, contextId, assetId ] = itemId.split('_');
 
     const pageWindow = getOriginalWindow(window);
@@ -44,7 +25,19 @@ export class Inventory {
     
     const cacheKey = [steamId, appId, contextId, countryCode].join('_');
     if (!Object.prototype.hasOwnProperty.call(this.inventory, cacheKey)) {
-      await this.fetchInventory(steamId, appId, contextId, countryCode, itemsCount);
+      const {
+        assets,
+        descriptions,
+        success: inventorySuccess,
+      } = await getInventory(steamId, appId, contextId, countryCode, itemsCount);
+    
+      if (!inventorySuccess) {
+        this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory request failed' });
+        return;
+      }
+    
+      const cacheKey = [steamId, appId, contextId, countryCode].join('_');
+      this.inventory[cacheKey] = { assets, descriptions };
     }
     const { assets, descriptions } = this.inventory[cacheKey];
     
@@ -70,14 +63,15 @@ export class Inventory {
       this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory description lookup failed' });
       return Promise.reject();
     }
-  
+
     const itemData = {
-      cacheKey,
+      itemId,
       appId,
       contextId,
       assetId,
       marketHashName: encodeURIComponent(marketHashName),
       currencyId,
+      price,
       priceValue: price.split(' ')[0].replace(',', '.'),
       priceCurrency: price.split(' ')[1],
       marketName,
@@ -87,28 +81,7 @@ export class Inventory {
     return itemData;
   }
 
-  @action.bound async select(itemId: string, selected: boolean): Promise<void> {
-    if (!Object.keys(this.items).includes(itemId)) {
-      const itemData = await this.find(itemId);
-      this.items[itemId] = { ...itemData };
-    }
- 
-    this.items[itemId].selected = selected;
-    this.rootStore.logger.log({ tag: 'Selected', message: JSON.stringify(this.items[itemId], null, '  ') });
-  }
-
-  @action clear = () => {
-    this.items = {};
-    Object.values(this.onClearHandlers).forEach((handler: Function) => handler());
-  }
-
   @action toggleSelling = () => {
     this.selling = !this.selling;
   }
-
-  @computed get selected() {
-    return Object.values(this.items).filter((item: any) => item.selected);
-  }
-
-  @action sell = () => {}
 }

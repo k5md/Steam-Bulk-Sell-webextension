@@ -5,7 +5,7 @@ import { BaseWrapper } from '../BaseWrapper';
 import { ControlsContainer } from '../elements';
 import { store } from '../stores';
 
-const { inventory: { clear }, logger: { log } } = store;
+const { inventory: { items: { clear } }, logger: { log } } = store;
 
 export class ControlsWrapper extends BaseWrapper {
   constructor() {

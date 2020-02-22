@@ -1,17 +1,12 @@
 import React, { useState, useEffect }  from 'react';
 import { observer } from 'mobx-react';
 import { SellModal } from '../';
-import { useInventory } from 'content/stores';
+import { useInventory, useItems } from 'content/stores';
 import { getIconUrl } from 'content/API';
 
 export const SellModalContainer = observer(({ id }) => {
-  const {
-    selected,
-    clear,
-    sell,
-    toggleSelling,
-    selling,
-  } = useInventory();
+  const { toggleSelling, selling } = useInventory();
+  const { selected, clear, sell } = useItems();
 
   const clearHandler = () => {
     clear();

@@ -5,14 +5,12 @@ import styles from './index.scss';
 
 export const Checkbox = ({
   id = '',
-  onClick = identity,
+  onChange = identity,
+  checked = null,
 }) => {
-  const checkboxRef = useRef(null);
-  const clickHandler = () => onClick(checkboxRef.current.checked);
-
   return (
     <label id={id} className={styles.container}>
-      <input type="checkbox" ref={checkboxRef} onClick={clickHandler}/>
+      <input type="checkbox" onChange={onChange} checked={checked}/>
       <span className={styles.checkmark}></span>
     </label>
   );

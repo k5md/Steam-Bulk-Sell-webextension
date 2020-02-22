@@ -3,29 +3,31 @@ import { uniqueId } from 'lodash';
 import { EXTENSION_NAME, INVENTORIES_WRAPPER } from '../constants';
 import { checkElement } from '../../utils';
 import { BaseWrapper } from '../BaseWrapper';
-import { Checkbox } from '../elements';
+import { ItemContainer } from '../elements';
 import { store } from '../stores';
 
-const { inventory: { select, onClearHandlers }, logger: { log } } = store;
+const { inventory: { items }, logger: { log } } = store;
 
 export class OverlayWrapper extends BaseWrapper {
   constructor() {
     super();
   }
 
-  createElement = (itemHolder): void => {
+  createElement = async (itemHolder): Promise<void> => {
     const { id: itemId } = itemHolder.firstChild as HTMLElement;
-    const clickHandler = checked => select(itemId, checked);
 
     if (this.elements.some((element: any) => element.id === itemId)) {
       return;
     }
 
+    await items.create(itemId);
+
     const element = {
-      element: <Checkbox id={`${EXTENSION_NAME}-Overlay-${uniqueId()}`} onClick={clickHandler} />,
+      element: <ItemContainer id={`${EXTENSION_NAME}-Overlay-${uniqueId()}`} />,
       selector: () => itemHolder,
       id: itemId,
     };
+
     const wrapper = this.mountElement(element);
     this.elements.push(element);
     this.wrappers.push(wrapper);
@@ -52,15 +54,6 @@ export class OverlayWrapper extends BaseWrapper {
         observer.observe(this.container, { childList: true, subtree: true });
         this.disposers.push(() => observer.disconnect());
       });
-
-      onClearHandlers['overlayWrapper'] = () => {
-        this.reset();
-        this.mount();
-        [addedItems, addedPage, changedItems ].forEach((observer) => {
-          observer.observe(this.container, { childList: true, subtree: true });
-          this.disposers.push(() => observer.disconnect());
-        });
-      };
 
       log({ tag: 'Init', message: '[✓] Overlay' });
     });

@@ -5,3 +5,4 @@ export { SellModal } from './SellModal';
 export { ControlsContainer } from './ControlsContainer';
 export { SellModalContainer } from './SellModalContainer';
 export { Checkbox } from './Checkbox';
+export { ItemContainer } from './ItemContainer';
