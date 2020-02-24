@@ -1,36 +1,52 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 import { Modal } from '../Modal';
 import styles from './index.scss';
 import { BUTTON_SECONDARY, BUTTON_PRIMARY } from 'content/constants';
+import { Item } from 'content/stores/Item';
 
-export const SellModal = ({
+export interface SellModalProps {
+  id: string;
+  sellHandler: (...args: any[]) => void;
+  closeHandler: (...args: any[]) => void;
+  clearHandler: (...args: any[]) => void;
+  items: Item[];
+  open: boolean;
+  total: number;
+  multiplyModifier: number;
+  priceModifier: string;
+  setPriceModifier: (...args: any[]) => void;
+  setMultiplyModifier: (...args: any[]) => void;
+}
+
+export const SellModal = observer(({
   id,
   sellHandler,
   closeHandler,
   clearHandler,
   items,
   open,
-  handlePriceModifierChange,
-  percentageModifier,
+  total,
+  multiplyModifier,
   priceModifier,
-  handlePercentageModifierChange,
-  makeHandlePriceChange,
-}) => {
-  const renderedItems = items.map(({ marketName, priceValue, priceCurrency, src, cacheKey }, index) => (
-    <div className={styles.modal_items__entry} key={cacheKey}>
+  setPriceModifier,
+  setMultiplyModifier,
+}: SellModalProps) => {
+  const renderedItems = items.map(({ marketName, price, currency, iconUrl, itemId, setPrice }, index) => (
+    <div className={styles.modal_items__entry} key={itemId}>
       <div className={styles.modal_items__entry_flex}>
-        <img src={src} />
+        <img src={iconUrl} />
       </div>
       <div className={styles.modal_items__entry_ellipsized}>{marketName}</div>
       <div className={styles.modal_items__entry_inline_flex}>
         <input
           type="text"
           pattern="[0-9]+([\.][0-9]{1,})?"
-          value={priceValue}
+          value={price}
           readOnly={priceModifier !== 'custom'}
-          onInput={makeHandlePriceChange(index)}
+          onInput={(e) => setPrice((e.target as HTMLInputElement).value)}
         />
-        <div>{priceCurrency}</div>
+        <div>{currency}</div>
       </div>
     </div>
   ));
@@ -41,7 +57,9 @@ export const SellModal = ({
     </div>
   );
 
-  const total = items.reduce((acc, cur) => acc + parseFloat(cur.priceValue), 0)
+  console.log(items.map(({ marketName, price, currency, iconUrl, itemId, setPrice }) => console.log(
+    marketName, price, itemId)
+  ));
 
   return (
     <Modal open={open} id={id} onClose={closeHandler}>
@@ -60,27 +78,25 @@ export const SellModal = ({
               type="radio"
               name="priceModifier"
               value="median"
-              onChange={handlePriceModifierChange}
+              onChange={setPriceModifier}
               checked={priceModifier === 'median'}
             />
           </div>
           <div>
-            <label>{browser.i18n.getMessage('modal_price_modifier_percentage')}</label>
+            <label>{browser.i18n.getMessage('modal_price_modifier_multiply')}</label>
             <input
               type="radio"
               name="priceModifier"
-              value="percentage"
-              onChange={handlePriceModifierChange}
-              checked={priceModifier === 'percentage'}
+              value="multiply"
+              onChange={setPriceModifier}
+              checked={priceModifier === 'multiply'}
             />
             <input
               type="text"
-              pattern="[-|+][0-9]{1,3}"
-              size={4}
-              maxLength={4}
-              value={percentageModifier}
-              onInput={handlePercentageModifierChange}
-              className={styles.modal_sell__percentage_number}
+              pattern="[0-9]{1,3}"
+              value={multiplyModifier}
+              onInput={setMultiplyModifier}
+              className={styles.modal_sell__multiply_number}
             />
           </div>
           <div>
@@ -89,7 +105,7 @@ export const SellModal = ({
               type="radio"
               name="priceModifier"
               value="custom"
-              onChange={handlePriceModifierChange}
+              onChange={setPriceModifier}
               checked={priceModifier === 'custom'}
             />
           </div>
@@ -111,10 +127,12 @@ export const SellModal = ({
             type="button"
             value={browser.i18n.getMessage('modal_button_sell')}
             className={BUTTON_PRIMARY}
-            onClick={() => sellHandler(items)}
+            onClick={sellHandler}
           />
         </div>
       </div>
     </Modal>
   );
-};
+});
+
+export default SellModal;

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { identity } from 'lodash';
 
 import styles from './index.scss';

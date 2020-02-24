@@ -30,6 +30,7 @@
     "mini-css-extract-plugin": "^0.8.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.1.7",
+    "mobx-utils": "^5.5.4",
     "node-sass": "^4.13.1",
     "preact": "^10.0.1",
     "preact-compat": "^3.19.0",

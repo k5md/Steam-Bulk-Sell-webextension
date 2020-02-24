@@ -24,7 +24,7 @@ export class BaseWrapper {
   }
 
   public mount(): void {
-    this.wrappers = this.elements.map(element => this.mountElement(element));
+    this.wrappers = this.elements.map(element => this.mountElement(element)).filter(wrapper => wrapper);
   }
 
   public onMount(): void {}

@@ -3,7 +3,7 @@ import { uniqueId } from 'lodash';
 import { EXTENSION_NAME, INVENTORIES_WRAPPER } from '../constants';
 import { checkElement } from '../../utils';
 import { BaseWrapper } from '../BaseWrapper';
-import { ItemContainer } from '../elements';
+import { CheckboxContainer } from '../elements';
 import { store } from '../stores';
 
 const { inventory: { items }, logger: { log } } = store;
@@ -13,21 +13,18 @@ export class OverlayWrapper extends BaseWrapper {
     super();
   }
 
-  createElement = async (itemHolder): Promise<void> => {
+  createElement = (itemHolder): void => {
     const { id: itemId } = itemHolder.firstChild as HTMLElement;
-
     if (this.elements.some((element: any) => element.id === itemId)) {
       return;
     }
 
-    await items.create(itemId);
-
+    items.create(itemId);
     const element = {
-      element: <ItemContainer id={`${EXTENSION_NAME}-Overlay-${uniqueId()}`} />,
+      element: <CheckboxContainer id={`${EXTENSION_NAME}-Overlay-${uniqueId()}`} itemId={itemId} />,
       selector: () => itemHolder,
       id: itemId,
     };
-
     const wrapper = this.mountElement(element);
     this.elements.push(element);
     this.wrappers.push(wrapper);

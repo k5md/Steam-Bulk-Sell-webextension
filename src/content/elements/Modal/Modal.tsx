@@ -1,6 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './index.scss';
 
+export interface ModalProps {
+  id: string;
+  open: boolean;
+  onOpen?: (...args: any[]) => void | React.EffectCallback;
+  onClose?: (...args: any[]) => void;
+  children?: React.ReactNode[];
+}
+
 export const Modal = ({
   id,
   open,

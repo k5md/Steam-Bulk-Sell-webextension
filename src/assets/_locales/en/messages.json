@@ -31,9 +31,9 @@
     "description": "Title for radiobutton to use average price taken from steam price info for selling items"
   },
   
-  "modal_price_modifier_percentage": {
-    "message": "+/- percentage from median price",
-    "description": "Title for radiobutton to use (average price + percentage from it) for selling items"
+  "modal_price_modifier_multiply": {
+    "message": "Multiply median price by",
+    "description": "Title for radiobutton to use (average price * multiplier) for selling items"
   },
 
   "modal_price_modifier_custom": {

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { useItem } from 'content/stores';
 import { Checkbox } from '../';
 
-export const ItemContainer = observer((id, itemId) => {
+export const CheckboxContainer = observer(({ id, itemId }) => {
   const { selected, setSelected } = useItem(itemId);
 
   return (
@@ -11,4 +11,4 @@ export const ItemContainer = observer((id, itemId) => {
   );
 });
 
-export default ItemContainer;
+export default CheckboxContainer;

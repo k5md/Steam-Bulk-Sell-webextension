@@ -28,3 +28,5 @@ export const getOriginalWindow = (window: Window): any => new Proxy(window.wrapp
     return XPCNativeWrapper(target[property]);
   }
 });
+
+export const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms));

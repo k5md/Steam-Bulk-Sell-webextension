@@ -1,26 +1,61 @@
 import { observable, computed, action } from 'mobx';
-import { pickBy } from 'lodash';
+import { computedFn } from "mobx-utils";
+import { identity } from 'lodash';
 import { Item } from './Item';
 
 export class Items {
   constructor(public rootStore) {}
 
   @observable items: { [key: string]: Item } = {}
+  @observable _multiplyModifier = 0
+  @observable _priceModifier = 'median'
 
-  @computed get selected(): { [key: string]: Item } {
-    return pickBy(this.items, (item: Item) => item.selected);
+  @computed get selected(): Item[] {
+    return Object.values(this.items).filter((item: Item) => item.selected);
   }
 
-  @action clear = () => {
+  @action clear = (): void => {
     this.items = {};
   }
 
-  @action sell = () => {}
+  @action sell = (): void => {}
 
-  @action create = async (itemId: string): Promise<Item> => {
-    const itemData = await this.rootStore.inventory.fetch(itemId);
-    const item = new Item(itemData);
-    this.items[item.itemId] = item;
-    return this.items[item.itemId];
+  @action create(itemId: string): Item {
+    const item = new Item(this.rootStore, itemId);
+    this.items[itemId] = item;
+    return this.items[itemId];
+  }
+
+  @computed get multiplyModifier(): number {
+    return this._multiplyModifier;
+  }
+
+  @action setMultiplyModifier = (value: string): void => {
+    const parsed = parseFloat(value);
+    if (Number.isNaN(parsed) || parsed < -1) {
+      return;
+    }
+    this._multiplyModifier = parsed;
+  }
+
+  @computed get priceModifier(): string {
+    return this._priceModifier;
+  }
+
+  @action.bound setPriceModifier(value: string): void {
+    this._priceModifier = value;
+  }
+
+  applyPriceModifications = computedFn((value: number): number => {
+    console.log(value);
+      return ({ 
+      median: identity,
+      multiply: value => value * this._multiplyModifier,
+      custom: identity,
+    })[this.priceModifier](value)
+  })
+
+  @computed get total(): number {
+    return this.selected.reduce((acc, cur) => acc + cur.price, 0);
   }
 }
