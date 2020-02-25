@@ -1,10 +1,10 @@
 import { observable, computed, action } from 'mobx';
 import { computedFn } from "mobx-utils";
 import { identity } from 'lodash';
-import { Item } from './Item';
+import { Item, RootStore } from './';
 
 export class Items {
-  constructor(public rootStore) {}
+  constructor(public rootStore: RootStore) {}
 
   @observable items: { [key: string]: Item } = {}
   @observable _multiplyModifier = 0
@@ -46,14 +46,11 @@ export class Items {
     this._priceModifier = value;
   }
 
-  applyPriceModifications = computedFn((value: number): number => {
-    console.log(value);
-      return ({ 
-      median: identity,
-      multiply: value => value * this._multiplyModifier,
-      custom: identity,
-    })[this.priceModifier](value)
-  })
+  applyPriceModifications = computedFn((value: number): number => ({ 
+    median: identity,
+    multiply: (value: number): number => value * this._multiplyModifier,
+    custom: identity,
+  })[this.priceModifier](value))
 
   @computed get total(): number {
     return this.selected.reduce((acc, cur) => acc + cur.price, 0);

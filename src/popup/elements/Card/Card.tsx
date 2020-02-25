@@ -1,19 +1,19 @@
 import React from 'react';
 import BootstrapCard  from 'react-bootstrap/Card';
 
-const { Header, Body, Title } = BootstrapCard;
+const { Header, Body } = BootstrapCard;
 
-export interface Card {
+export interface Props {
   title?: string;
   styles?: {
-    container: string,
-    title: string,
-    body: string,
+    container?: string;
+    title?: string;
+    body?: string;
   };
   children: React.ReactNode;
 }
 
-export const Card = ({
+export const Card: React.FC<Props> = ({
   title,
   styles: {
     container: containerStyle = '',

@@ -1,25 +1,25 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, MouseEventHandler } from 'react';
 import styles from './index.scss';
 
-export interface ModalProps {
+export interface Props {
   id: string;
   open: boolean;
-  onOpen?: (...args: any[]) => void | React.EffectCallback;
-  onClose?: (...args: any[]) => void;
+  onOpen?: React.EffectCallback;
+  onClose?: React.EffectCallback;
   children?: React.ReactNode[];
 }
 
-export const Modal = ({
+export const Modal: React.FC<Props> = ({
   id,
   open,
-  onOpen = () => {},
-  onClose = () => {},
+  onOpen = (): void => {},
+  onClose = (): void => {},
   children = [],
 }) => {
   useEffect(onOpen, []);
 
   const modalRef = useRef(null);
-  const backdropClickHandler = (e) => {
+  const backdropClickHandler: MouseEventHandler = (e) => {
     const target  = e.target as Element;
     if (target === modalRef.current && target.closest(modalRef.current)) {
       return;

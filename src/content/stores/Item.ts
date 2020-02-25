@@ -1,4 +1,5 @@
 import { observable, action, computed } from 'mobx';
+import { RootStore } from './';
 
 export type ItemConstructorParameter = {
    itemId: string;
@@ -32,7 +33,7 @@ export class Item implements ItemConstructorParameter{
   marketName: string;
   iconUrl: string;
 
-  constructor(rootStore, itemId: string) {
+  constructor(rootStore: RootStore, itemId: string) {
     const [ appId, contextId, assetId ] = itemId.split('_');
     this.itemId = itemId;
     this.appId = appId;
@@ -46,14 +47,13 @@ export class Item implements ItemConstructorParameter{
     Object.assign(this, itemData);
   }
 
-  @action.bound async setSelected(selected): Promise<void> {
+  @action.bound async setSelected(selected: boolean): Promise<void> {
     if (!this.initialized) {
       await this.initialize();
       this.initialized = true;
     }
- 
     this.selected = selected;
-    this.rootStore.logger.log({ tag: 'Selected', message: JSON.stringify(this, null, '  ') });
+    this.rootStore.logger.log({ tag: 'Selected', message: JSON.stringify({ marketHashName: this.marketHashName, selected }, null, '  ') });
   }
 
   @computed get price(): number {
@@ -61,11 +61,10 @@ export class Item implements ItemConstructorParameter{
       this._price = parseFloat(this.marketPrice);
     }
     const { applyPriceModifications } = this.rootStore.inventory.items;
-    console.log(applyPriceModifications(this._price));
     return applyPriceModifications(this._price);
   }
 
-  @action setPrice = (value: string) => {
+  @action setPrice = (value: string): void => {
     const parsed = parseFloat(value);
 
     if (Number.isNaN(parsed) || parsed < 0) {

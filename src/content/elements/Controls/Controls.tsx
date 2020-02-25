@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import { BUTTON_PRIMARY } from '../../constants';
 
-export const Controls = ({ id, sellHandler }) => (
+export interface Props {
+  id: string;
+  sellHandler: MouseEventHandler;
+}
+
+export const Controls: React.FC<Props> = ({ id, sellHandler }) => (
   <div id={id}>
     <input
       type="button"

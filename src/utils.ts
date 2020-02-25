@@ -7,19 +7,19 @@ export const applyStyles = (element: HTMLElement, styles: object): void => apply
 
 export const requestAnimationFrameAsync = (): Promise<number> => new Promise(resolve => window.requestAnimationFrame(resolve));
 
-export const checkElement = async (selector: string): Promise<Element> => {
+export const checkElement = async (selector: string): Promise<HTMLElement> => {
   const querySelector = document.querySelector(selector);
   while (querySelector === null) await requestAnimationFrameAsync();
-  return querySelector;
+  return querySelector as HTMLElement;
 };
 
-export const checkElements = async (selector: string): Promise<Array<Element>> => {
+export const checkElements = async (selector: string): Promise<HTMLElement[]> => {
   const querySelectorAll = document.querySelectorAll(selector);
   while (!querySelectorAll.length) await requestAnimationFrameAsync();
-  return Array.from(querySelectorAll);
+  return Array.from(querySelectorAll) as HTMLElement[];
 };
 
-// To access page global variables from content script we need to get not xrayed window and
+// To access page global variables from content script we need to get not x-rayed window and
 // Wrap requested properties in native wrapper for safety's sake
 export const getOriginalWindow = (window: Window): any => new Proxy(window.wrappedJSObject, {
   get: function(target, property: string | number | symbol): any {
@@ -28,5 +28,3 @@ export const getOriginalWindow = (window: Window): any => new Proxy(window.wrapp
     return XPCNativeWrapper(target[property]);
   }
 });
-
-export const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms));

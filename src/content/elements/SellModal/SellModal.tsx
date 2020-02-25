@@ -5,7 +5,7 @@ import styles from './index.scss';
 import { BUTTON_SECONDARY, BUTTON_PRIMARY } from 'content/constants';
 import { Item } from 'content/stores/Item';
 
-export interface SellModalProps {
+export interface Props {
   id: string;
   sellHandler: (...args: any[]) => void;
   closeHandler: (...args: any[]) => void;
@@ -19,7 +19,7 @@ export interface SellModalProps {
   setMultiplyModifier: (...args: any[]) => void;
 }
 
-export const SellModal = observer(({
+export const SellModal: React.FC<Props> = observer(({
   id,
   sellHandler,
   closeHandler,
@@ -31,7 +31,7 @@ export const SellModal = observer(({
   priceModifier,
   setPriceModifier,
   setMultiplyModifier,
-}: SellModalProps) => {
+}: Props) => {
   const renderedItems = items.map(({ marketName, price, currency, iconUrl, itemId, setPrice }, index) => (
     <div className={styles.modal_items__entry} key={itemId}>
       <div className={styles.modal_items__entry_flex}>
@@ -56,10 +56,6 @@ export const SellModal = observer(({
       <p>{browser.i18n.getMessage('modal_items_empty')}</p>
     </div>
   );
-
-  console.log(items.map(({ marketName, price, currency, iconUrl, itemId, setPrice }) => console.log(
-    marketName, price, itemId)
-  ));
 
   return (
     <Modal open={open} id={id} onClose={closeHandler}>

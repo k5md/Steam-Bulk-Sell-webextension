@@ -1,10 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { EXTENSION_NAME } from '../../constants';
-import { useLogger, useInventory } from 'content/stores';
+import { EXTENSION_NAME } from 'content/constants';
+import { useLogger, useInventory } from 'content/hooks';
 import { Controls, Logger } from '../';
 
-export const ControlsContainer = observer(() => {
+export const ControlsContainer: React.FC = observer(() => {
   const { logs } = useLogger();
   const { toggleSelling } = useInventory();
 

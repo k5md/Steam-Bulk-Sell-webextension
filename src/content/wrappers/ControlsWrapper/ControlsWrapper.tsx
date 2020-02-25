@@ -1,11 +1,11 @@
 import React from 'react';
-import { CONTROLS_WRAPPER, APP_LOGO, INVENTORY_PAGE_TABS, } from '../constants';
-import { checkElement, checkElements, applyStyles } from '../../utils';
-import { BaseWrapper } from '../BaseWrapper';
-import { ControlsContainer } from '../elements';
-import { store } from '../stores';
+import { CONTROLS_WRAPPER, APP_LOGO, INVENTORY_PAGE_TABS, } from 'content/constants';
+import { checkElement, checkElements, applyStyles } from 'utils';
+import { BaseWrapper } from '../';
+import { ControlsContainer } from 'content/elements';
+import { store } from 'content/stores';
 
-const { inventory: { items: { clear } }, logger: { log } } = store;
+const { inventory: { items }, logger: { log } } = store;
 
 export class ControlsWrapper extends BaseWrapper {
   constructor() {
@@ -26,7 +26,7 @@ export class ControlsWrapper extends BaseWrapper {
     const appLogo: HTMLElement = this.container.querySelector(APP_LOGO);
     const observer = new MutationObserver(this.resetContainerStyles);
     observer.observe(appLogo, { attributeFilter: ['src'] });
-    return () => observer.disconnect();
+    return (): void => observer.disconnect();
   }
 
   onReset = (): void => {
@@ -38,7 +38,7 @@ export class ControlsWrapper extends BaseWrapper {
   }
 
   init = (): void => {
-    checkElement(CONTROLS_WRAPPER).then((container: HTMLElement) => {
+    checkElement(CONTROLS_WRAPPER).then((container) => {
       this.container = container;
       this.elements = [{ element: <ControlsContainer /> }];
       this.render();   
@@ -46,7 +46,7 @@ export class ControlsWrapper extends BaseWrapper {
     });
 
     checkElements(INVENTORY_PAGE_TABS).then((inventoryPageTabs) => {
-      Array.from(inventoryPageTabs).forEach(tab => tab.addEventListener('click', clear));
+      Array.from(inventoryPageTabs).forEach(tab => tab.addEventListener('click', items.clear));
     });
   }
 }

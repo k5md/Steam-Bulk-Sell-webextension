@@ -17,6 +17,7 @@ module.exports = {
   rules: {
     "react/jsx-uses-react": 1,
     "react/jsx-uses-vars": 1,
+    "@typescript-eslint/no-empty-function": 0,
   },
   settings:  {
     react:  {

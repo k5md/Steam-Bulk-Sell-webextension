@@ -1,19 +1,21 @@
 import ReactDOM from 'react-dom';
 import { identity } from 'lodash';
 
+export interface WrapperElement {
+  element: JSX.Element;
+  selector?(...args): HTMLElement;
+  id?: string;
+}
+
 export class BaseWrapper {
   constructor(
     public container: HTMLElement = null,
-    public elements: {
-      element: JSX.Element;
-      selector?: Function;
-      id?: string;
-    }[] = [],
+    public elements: WrapperElement[] = [],
     public wrappers: HTMLElement[] = [],
     public disposers: Function[] = [],
   ) {}
 
-  public mountElement({ element, selector = identity }): HTMLElement {
+  public mountElement({ element, selector = identity }: WrapperElement): HTMLElement {
     const wrapper = document.createElement('div');
     const target = selector(this.container);
     if (!target) {

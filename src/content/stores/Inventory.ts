@@ -1,16 +1,15 @@
-import { observable, action, toJS } from 'mobx';
-import { getInventory, getPrice, getIconUrl } from '../API';
-import { getOriginalWindow } from '../../utils'; // TODO: move it from mobx store to components?
-import { Items } from './Items';
-import { ItemConstructorParameter } from './Item';
+import { observable, action } from 'mobx';
+import { getInventory, getPrice, getIconUrl } from 'content/API';
+import { getOriginalWindow } from 'utils'; // TODO: move it from mobx store to components?
+import { Items, ItemConstructorParameter, RootStore } from './';
 
 export class Inventory {
   @observable inventory = {} // holds all items in two arrays: assets and descriptions
-  @observable items; // contains items from inventory with which user has interacted
+  @observable items: Items; // contains items from inventory with which user has interacted
   @observable selling = false // show selling modal
   fetchingInventory = false;
 
-  constructor(public rootStore) {
+  constructor(public rootStore: RootStore) {
     this.items = new Items(rootStore);
   }
 
@@ -87,7 +86,7 @@ export class Inventory {
     return itemData;
   }
 
-  @action toggleSelling = () => {
+  @action toggleSelling = (): void => {
     this.selling = !this.selling;
   }
 }

@@ -1,8 +1,7 @@
 import React from 'react';
-
 import styles from './index.scss';
 
-export const Guide = () => (
+export const Guide: React.FC = () => (
   <div>
     <div>
       <p>{browser.i18n.getMessage('guide_purpose')}</p>

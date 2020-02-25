@@ -1,10 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
+import { LoggerEntry } from 'content/stores';
 import styles from './index.scss';
 
 export interface Props {
   id: string;
-  children: any;
+  children: LoggerEntry[];
 }
 
 export const Logger = observer(({ id, children }: Props) => {

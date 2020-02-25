@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { ChangeEventHandler } from 'react';
 import { identity } from 'lodash';
 
 import styles from './index.scss';
 
-export const Checkbox = ({
+export interface Props {
+  id?: string;
+  onChange?: ChangeEventHandler;
+  checked?: boolean;
+}
+
+export const Checkbox: React.FC<Props> = ({
   id = '',
   onChange = identity,
   checked = null,

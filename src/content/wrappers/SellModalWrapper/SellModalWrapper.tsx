@@ -1,9 +1,9 @@
 import React from 'react';
-import { EXTENSION_NAME, MODAL_WRAPPER } from '../constants';
-import { checkElement } from '../../utils';
-import { BaseWrapper } from '../BaseWrapper';
-import { SellModalContainer } from '../elements/SellModalContainer';
-import { store } from '../stores';
+import { EXTENSION_NAME, MODAL_WRAPPER } from 'content/constants';
+import { checkElement } from 'utils';
+import { BaseWrapper } from '../';
+import { SellModalContainer } from 'content/elements';
+import { store } from 'content/stores';
 
 const { logger: { log } } = store;
 
@@ -13,7 +13,7 @@ export class SellModalWrapper extends BaseWrapper {
   }
 
   init = (): void => {
-    checkElement(MODAL_WRAPPER).then((container: HTMLElement) => {
+    checkElement(MODAL_WRAPPER).then((container) => {
       this.container = container;
       this.elements = [{ element: <SellModalContainer id={`${EXTENSION_NAME}-Modal`} /> }];
       this.render();

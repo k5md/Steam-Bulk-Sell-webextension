@@ -1,13 +1,13 @@
 import React, { useEffect }  from 'react';
 import { observer } from 'mobx-react-lite';
 import { SellModal } from '../';
-import { useInventory, useItems } from 'content/stores';
+import { useInventory, useItems } from 'content/hooks';
 
 export interface Props {
   id: string;
 }
 
-export const SellModalContainer = observer(({ id }: Props) => {
+export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
   const { toggleSelling, selling } = useInventory();
   const { 
     selected,
@@ -20,7 +20,7 @@ export const SellModalContainer = observer(({ id }: Props) => {
     total,
   } = useItems();
 
-  const clearHandler = () => {
+  const clearHandler = (): void => {
     clear();
     toggleSelling();
   };
@@ -39,8 +39,8 @@ export const SellModalContainer = observer(({ id }: Props) => {
       open={selling}
       multiplyModifier={multiplyModifier}
       priceModifier={priceModifier}
-      setPriceModifier={(e) => setPriceModifier(e.target.value)}
-      setMultiplyModifier={(e) => setMultiplyModifier(e.target.value)}
+      setPriceModifier={(e): void => setPriceModifier(e.target.value)}
+      setMultiplyModifier={(e): void => setMultiplyModifier(e.target.value)}
       total={total}
     />
   );

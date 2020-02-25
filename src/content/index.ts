@@ -1,6 +1,4 @@
-import { ControlsWrapper } from './ControlsWrapper';
-import { OverlayWrapper } from './OverlayWrapper';
-import { SellModalWrapper } from './SellModalWrapper';
+import { ControlsWrapper, OverlayWrapper, SellModalWrapper } from './wrappers';
 import { getOriginalWindow } from '../utils';
 import { EXTENSION_NAME } from './constants';
 

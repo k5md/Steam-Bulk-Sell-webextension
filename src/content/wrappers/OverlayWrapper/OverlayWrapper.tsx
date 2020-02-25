@@ -1,10 +1,10 @@
 import React from 'react';
 import { uniqueId } from 'lodash';
-import { EXTENSION_NAME, INVENTORIES_WRAPPER } from '../constants';
-import { checkElement } from '../../utils';
-import { BaseWrapper } from '../BaseWrapper';
-import { CheckboxContainer } from '../elements';
-import { store } from '../stores';
+import { EXTENSION_NAME, INVENTORIES_WRAPPER } from 'content/constants';
+import { checkElement } from 'utils';
+import { BaseWrapper } from '../';
+import { CheckboxContainer } from 'content/elements';
+import { store } from 'content/stores';
 
 const { inventory: { items }, logger: { log } } = store;
 
@@ -13,16 +13,16 @@ export class OverlayWrapper extends BaseWrapper {
     super();
   }
 
-  createElement = (itemHolder): void => {
+  createElement = (itemHolder: Node): void => {
     const { id: itemId } = itemHolder.firstChild as HTMLElement;
-    if (this.elements.some((element: any) => element.id === itemId)) {
+    if (this.elements.some((element) => element.id === itemId)) {
       return;
     }
 
     items.create(itemId);
     const element = {
       element: <CheckboxContainer id={`${EXTENSION_NAME}-Overlay-${uniqueId()}`} itemId={itemId} />,
-      selector: () => itemHolder,
+      selector: (): HTMLElement => itemHolder as HTMLElement,
       id: itemId,
     };
     const wrapper = this.mountElement(element);
@@ -31,7 +31,7 @@ export class OverlayWrapper extends BaseWrapper {
   }
 
   init = async (): Promise<void> => {
-    checkElement(INVENTORIES_WRAPPER).then((container: HTMLElement) => {
+    checkElement(INVENTORIES_WRAPPER).then((container) => {
       this.container = container;
 
       const addedItems = new MutationObserver(mutationsList => mutationsList
