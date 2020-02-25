@@ -1,7 +1,13 @@
 import React, { useRef, useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
 import styles from './index.scss';
 
-export const Logger = ({ id, children }) => {
+export interface Props {
+  id: string;
+  children: any;
+}
+
+export const Logger = observer(({ id, children }: Props) => {
   const loggerRef = useRef(null);
 
   useEffect(() => {
@@ -15,6 +21,6 @@ export const Logger = ({ id, children }) => {
       ))}
     </div>
   );
-};
+});
 
 export default Logger;

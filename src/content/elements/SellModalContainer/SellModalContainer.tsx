@@ -1,9 +1,13 @@
 import React, { useEffect }  from 'react';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { SellModal } from '../';
 import { useInventory, useItems } from 'content/stores';
 
-export const SellModalContainer = observer(({ id }) => {
+export interface Props {
+  id: string;
+}
+
+export const SellModalContainer = observer(({ id }: Props) => {
   const { toggleSelling, selling } = useInventory();
   const { 
     selected,

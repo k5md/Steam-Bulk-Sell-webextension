@@ -4,7 +4,6 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const JSXJS = path.resolve(__dirname, 'src/jsx.js');
 const DIST_DIR = path.resolve(__dirname, 'dist');
 const SRC_DIR = path.resolve(__dirname, 'src');
 
@@ -20,6 +19,11 @@ module.exports = {
   resolve: {
     modules: [SRC_DIR, 'node_modules'],
     extensions: ['.js', '.json', '.ts', '.tsx'],
+    alias: { 
+      "react": "preact/compat",
+      "react-dom/test-utils": "preact/test-utils",
+      "react-dom": "preact/compat",
+    },
   },
   module: {
     rules: [

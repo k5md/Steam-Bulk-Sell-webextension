@@ -1,5 +1,5 @@
 import React from 'react';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { EXTENSION_NAME } from '../../constants';
 import { useLogger, useInventory } from 'content/stores';
 import { Controls, Logger } from '../';

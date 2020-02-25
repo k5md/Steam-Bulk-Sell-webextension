@@ -1,9 +1,14 @@
 import React from 'react';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { useItem } from 'content/stores';
 import { Checkbox } from '../';
 
-export const CheckboxContainer = observer(({ id, itemId }) => {
+export interface Props {
+  id: string;
+  itemId: string;
+}
+
+export const CheckboxContainer = observer(({ id, itemId }: Props) => {
   const { selected, setSelected } = useItem(itemId);
 
   return (

@@ -8,6 +8,7 @@ export class Logger {
   constructor(public rootStore) {}
 
   @action log = (entry) => {
+    console.log('pushed log', entry);
     this.logs.push({ ...entry, id: uniqueId(`${EXTENSION_NAME}-Logger-`)});
   }
 }

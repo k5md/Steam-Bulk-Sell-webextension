@@ -1,5 +1,5 @@
 import React from 'react';
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import { Modal } from '../Modal';
 import styles from './index.scss';
 import { BUTTON_SECONDARY, BUTTON_PRIMARY } from 'content/constants';
