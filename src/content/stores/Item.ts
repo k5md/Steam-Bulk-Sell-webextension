@@ -53,7 +53,11 @@ export class Item implements ItemConstructorParameter{
       this.initialized = true;
     }
     this.selected = selected;
-    this.rootStore.logger.log({ tag: 'Selected', message: JSON.stringify({ marketHashName: this.marketHashName, selected }, null, '  ') });
+    this.rootStore.logger.log({ tag: 'Selected', message: JSON.stringify({
+      marketHashName: this.marketHashName,
+      price: this.price,
+      selected,
+    }, null, '  ') });
   }
 
   @computed get price(): number {
