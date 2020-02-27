@@ -1,5 +1,5 @@
 import React from 'react';
-import { CONTROLS_WRAPPER, APP_LOGO, INVENTORY_PAGE_TABS, } from 'content/constants';
+import { CONTROLS_WRAPPER, APP_LOGO, INVENTORY_PAGE_TABS, EXTENSION_NAME } from 'content/constants';
 import { checkElement, checkElements, applyStyles } from 'utils';
 import { BaseWrapper } from '../';
 import { ControlsContainer } from 'content/elements';
@@ -40,7 +40,7 @@ export class ControlsWrapper extends BaseWrapper {
   init = (): void => {
     checkElement(CONTROLS_WRAPPER).then((container) => {
       this.container = container;
-      this.elements = [{ element: <ControlsContainer /> }];
+      this.elements = [{ element: <ControlsContainer id={`${EXTENSION_NAME}-Controls`}/> }];
       this.render();   
       log({ tag: 'Init', message: '[✓] Controls' });
     });

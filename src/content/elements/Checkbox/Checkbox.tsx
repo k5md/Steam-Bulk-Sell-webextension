@@ -12,7 +12,7 @@ export interface Props {
 export const Checkbox: React.FC<Props> = ({
   id = '',
   onChange = identity,
-  checked = null,
+  checked = false,
 }) => {
   return (
     <label id={id} className={styles.container}>

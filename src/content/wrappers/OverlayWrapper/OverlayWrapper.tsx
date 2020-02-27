@@ -1,6 +1,6 @@
 import React from 'react';
 import { uniqueId } from 'lodash';
-import { EXTENSION_NAME, INVENTORIES_WRAPPER } from 'content/constants';
+import { EXTENSION_NAME, INVENTORIES_WRAPPER, ACTIVE_INVENTORY, ITEM_HOLDER } from 'content/constants';
 import { checkElement } from 'utils';
 import { BaseWrapper } from '../';
 import { CheckboxContainer } from 'content/elements';
@@ -14,7 +14,13 @@ export class OverlayWrapper extends BaseWrapper {
   }
 
   createElement = (itemHolder: Node): void => {
+    // return if itemholder is disabled
+    if (!itemHolder.firstChild) {
+      return; 
+    }
+
     const { id: itemId } = itemHolder.firstChild as HTMLElement;
+    // do not create overlay element if it is already present
     if (this.elements.some((element) => element.id === itemId)) {
       return;
     }
@@ -34,6 +40,12 @@ export class OverlayWrapper extends BaseWrapper {
     checkElement(INVENTORIES_WRAPPER).then((container) => {
       this.container = container;
 
+      // initial rendering in case all itemHolder elements already exist (mostly for developing)
+      const activeInventory = this.container.querySelector(ACTIVE_INVENTORY);
+      const itemHolders = activeInventory.querySelectorAll(ITEM_HOLDER);
+      itemHolders.forEach(this.createElement);
+      
+      // observers for added itemHolders
       const addedItems = new MutationObserver(mutationsList => mutationsList
         .filter(({ addedNodes }) => addedNodes.length && (addedNodes[0] as Element).classList.contains('itemHolder'))
         .forEach(({ addedNodes }) => this.createElement(addedNodes[0]))

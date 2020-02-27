@@ -27,7 +27,7 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
 
   useEffect(() => {
     document.body.style.overflowY = selling ? 'hidden' : 'revert';
-  }, [ selling ])
+  }, [ selling ]);
 
   return (
     <SellModal

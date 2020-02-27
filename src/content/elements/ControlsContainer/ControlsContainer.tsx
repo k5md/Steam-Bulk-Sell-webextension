@@ -1,20 +1,21 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { EXTENSION_NAME } from 'content/constants';
 import { useLogger, useInventory } from 'content/hooks';
 import { Controls, Logger } from '../';
 
-export const ControlsContainer: React.FC = observer(() => {
+export interface Props {
+  id: string;
+}
+
+export const ControlsContainer: React.FC<Props> = observer(({ id }) => {
   const { logs } = useLogger();
   const { toggleSelling } = useInventory();
 
   return (
-    <React.Fragment>
-      <Logger id={`${EXTENSION_NAME}-Logger`}>
-        {logs}
-      </Logger>
-      <Controls id={`${EXTENSION_NAME}-Controls`} sellHandler={toggleSelling} />
-    </React.Fragment>
+    <div id={id}>
+      <Logger>{logs}</Logger>
+      <Controls sellHandler={toggleSelling} />
+    </div>
   );
 });
 

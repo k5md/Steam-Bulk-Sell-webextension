@@ -1,6 +1,6 @@
 import { observable, computed, action } from 'mobx';
 import { computedFn } from "mobx-utils";
-import { identity } from 'lodash';
+import { identity, forOwn } from 'lodash';
 import { Item, RootStore } from './';
 
 export class Items {
@@ -15,7 +15,9 @@ export class Items {
   }
 
   @action clear = (): void => {
-    this.items = {};
+    this.items = forOwn(this.items, (value) => {
+      value.selected = false;
+    });
   }
 
   @action sell = (): void => {}

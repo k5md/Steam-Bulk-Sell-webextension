@@ -4,11 +4,10 @@ import { LoggerEntry } from 'content/stores';
 import styles from './index.scss';
 
 export interface Props {
-  id: string;
   children: LoggerEntry[];
 }
 
-export const Logger = observer(({ id, children }: Props) => {
+export const Logger = observer(({ children }: Props) => {
   const loggerRef = useRef(null);
 
   useEffect(() => {
@@ -16,7 +15,7 @@ export const Logger = observer(({ id, children }: Props) => {
   }, [ children.length ])
 
   return (
-    <div id={id} className={styles.logger__container} ref={loggerRef}>
+    <div className={styles.logger__container} ref={loggerRef}>
       {children.map(({ tag, message, id }) => (
         <pre key={id}>{`[${tag}]: ${message}`}</pre>
       ))}
