@@ -68,19 +68,19 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
       <input
         type="button" 
         value={browser.i18n.getMessage('modal_button_clear')}
-        className={BUTTON_SECONDARY}
+        className={[BUTTON_SECONDARY, styles.modal_sell__button].join(' ')}
         onClick={clearHandler}
       />
       <input
         type="button"
         value={browser.i18n.getMessage('modal_button_close')}
-        className={BUTTON_SECONDARY}
+        className={[BUTTON_SECONDARY, styles.modal_sell__button].join(' ')}
         onClick={closeHandler}
       />
       <input
         type="button"
         value={browser.i18n.getMessage('modal_button_sell')}
-        className={BUTTON_PRIMARY}
+        className={[BUTTON_PRIMARY, styles.modal_sell__button].join(' ')}
         onClick={sellHandler}
       />
     </div>
@@ -175,16 +175,18 @@ export const SellModal: React.FC<SellModalProps> = observer(({
   total,
 }) => (
     <Modal open={open} id={id} onClose={closeHandler}>
-      <SellModalItemsList items={items} total={total} priceModifier={priceModifier} />
-      <SellModalControls
-        sellHandler={sellHandler}
-        closeHandler={closeHandler}
-        clearHandler={clearHandler}
-        multiplyModifier={multiplyModifier}
-        setMultiplyModifier={setMultiplyModifier}
-        priceModifier={priceModifier}
-        setPriceModifier={setPriceModifier}
-      />
+      <div className={styles.modal_inner}>
+        <SellModalItemsList items={items} total={total} priceModifier={priceModifier} />
+        <SellModalControls
+          sellHandler={sellHandler}
+          closeHandler={closeHandler}
+          clearHandler={clearHandler}
+          multiplyModifier={multiplyModifier}
+          setMultiplyModifier={setMultiplyModifier}
+          priceModifier={priceModifier}
+          setPriceModifier={setPriceModifier}
+        />
+      </div>
     </Modal>
 ));
 

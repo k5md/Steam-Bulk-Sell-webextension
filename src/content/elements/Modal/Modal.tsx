@@ -6,7 +6,7 @@ export interface Props {
   open: boolean;
   onOpen?: React.EffectCallback;
   onClose?: React.EffectCallback;
-  children?: React.ReactNode[];
+  children?: React.ReactNode;
 }
 
 export const Modal: React.FC<Props> = ({

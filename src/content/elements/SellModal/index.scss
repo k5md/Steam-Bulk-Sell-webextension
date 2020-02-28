@@ -1,3 +1,7 @@
+.modal_inner {
+  display: contents;
+}
+
 .modal_sell__items {
   overflow-y: auto;
   flex-grow: 9000;
@@ -5,14 +9,23 @@
 
 .modal_sell__controls {
   display: flex;
+  flex-direction: column;
   justify-content: space-evenly;
   background-color: #181818;
-  padding: 10px;
   align-items: center;
+
+  @media (min-width: 560px) {
+    flex-direction: row;
+    padding: 10px;
+  }
 }
 
 .modal_sell__buttons {
-  display: contents;
+  padding: 10px 0;
+}
+
+.modal_sell__button {
+  margin: 0 10px;
 }
 
 .modal_sell__price_modifier {
@@ -21,7 +34,7 @@
 
 .modal_sell__multiply_number {
   padding-left: 10px;
-  margin-left: 10px
+  margin-left: 10px;
 }
 
 .modal_sell__divider {
