@@ -19,8 +19,60 @@ export class Inventory {
     const pageWindow = getOriginalWindow(window);
     const {
       g_strCountryCode: countryCode,
+      g_ActiveInventory: { m_rgAssets: assets},
+      g_rgWalletInfo: { wallet_currency: currencyId },
+    } = pageWindow;
+    
+    if (!assets[assetId]) {
+      return Promise.reject();
+    }
+    
+    const {
+      description: {
+        market_hash_name: marketHashName,
+        market_name: marketName,
+        icon_url: iconUrl,
+      },
+    } = assets[assetId];
+
+    const {
+      median_price: midPrice,
+      lowest_price: lowPrice,
+      success: priceSuccess,
+    } = await getPrice(countryCode, currencyId, appId, encodeURIComponent(marketHashName));
+
+    if (!priceSuccess) {
+      this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory description lookup failed' });
+      return Promise.reject();
+    }
+
+    const price = midPrice ? midPrice : lowPrice ? lowPrice : '0 руб.'
+
+    const itemData = {
+      itemId,
+      appId,
+      contextId,
+      assetId,
+      marketHashName,
+      marketHashNameEncoded: encodeURIComponent(marketHashName),
+      currencyId,
+      marketPrice: price.split(' ')[0].replace(',', '.'),
+      currency: price.split(' ')[1],
+      marketName,
+      iconUrl: getIconUrl(iconUrl),
+    };
+  
+    return itemData;
+  }
+
+  /*@action.bound async fetch(itemId: string): Promise<ItemConstructorParameter> {
+    const [ appId, contextId, assetId ] = itemId.split('_');
+
+    const pageWindow = getOriginalWindow(window);
+    const {
+      g_strCountryCode: countryCode,
       g_ActiveInventory: { m_steamid: steamId, m_cItems: itemsCount },
-      g_rgWalletInfo: { wallet_currency: currencyId }
+      g_rgWalletInfo: { wallet_currency: currencyId },
     } = pageWindow;
     
     const cacheKey = [steamId, appId, contextId, countryCode].join('_');
@@ -84,7 +136,7 @@ export class Inventory {
     };
   
     return itemData;
-  }
+  }*/
 
   @action toggleSelling = (): void => {
     this.selling = !this.selling;
