@@ -20,8 +20,6 @@ export class Items {
     });
   }
 
-  @action sell = (): void => {}
-
   @action create(itemId: string): Item {
     const item = new Item(this.rootStore, itemId);
     this.items[itemId] = item;

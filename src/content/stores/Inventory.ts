@@ -1,11 +1,12 @@
 import { observable, action } from 'mobx';
-import { getPrice, getIconUrl } from 'content/API';
-import { getOriginalWindow } from 'utils'; // TODO: move it from mobx store to components?
+import { isUndefined } from 'lodash';
+import { getPrice, getIconUrl, sellItem } from 'content/API';
+import { getOriginalWindow } from 'utils';
 import { Items, ItemConstructorParameter, RootStore } from './';
 
 export class Inventory {
-  @observable items: Items; // contains items from inventory with which user has interacted
-  @observable selling = false // show selling modal
+  @observable items: Items;
+  @observable showSellModal = false;
 
   constructor(public rootStore: RootStore) {
     this.items = new Items(rootStore);
@@ -32,16 +33,15 @@ export class Inventory {
     const {
       median_price: midPrice,
       lowest_price: lowPrice,
-      success: priceSuccess,
-    } = await getPrice(countryCode, currencyId, appId, encodeURIComponent(marketHashName));
+    } = await getPrice({ countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) });
 
-    if (!priceSuccess) {
+    if ([ midPrice, lowPrice ].every(isUndefined)) {
       this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory price lookup failed' });
       return Promise.reject();
     }
 
-    const price = midPrice ? midPrice : lowPrice ? lowPrice : '0 руб.'
-
+    const price = isUndefined(midPrice) ? lowPrice : midPrice;
+  
     const itemData = {
       itemId,
       appId,
@@ -59,7 +59,16 @@ export class Inventory {
     return itemData;
   }
 
-  @action toggleSelling = (): void => {
-    this.selling = !this.selling;
+  @action.bound async sell(): Promise<void> {
+    const pageWindow = getOriginalWindow(window);
+    const { g_sessionId: sessionId } = pageWindow;
+    this.items.selected.forEach((item) => {
+      const { appId, contextId, assetId, price } = item;
+      sellItem({ appId, contextId, assetId, price: String(price), sessionId }).then(result => console.log(result));
+    });
+  }
+
+  @action toggleSellModal = (): void => {
+    this.showSellModal = !this.showSellModal;
   }
 }

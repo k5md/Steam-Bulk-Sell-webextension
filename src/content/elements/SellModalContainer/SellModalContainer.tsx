@@ -8,11 +8,10 @@ export interface Props {
 }
 
 export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
-  const { toggleSelling, selling } = useInventory();
+  const { toggleSellModal, showSellModal, sell } = useInventory();
   const { 
     selected,
     clear,
-    sell,
     multiplyModifier,
     priceModifier,
     setPriceModifier,
@@ -22,21 +21,21 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
 
   const clearHandler = (): void => {
     clear();
-    toggleSelling();
+    toggleSellModal();
   };
 
   useEffect(() => {
-    document.body.style.overflowY = selling ? 'hidden' : 'revert';
-  }, [ selling ]);
+    document.body.style.overflowY = showSellModal ? 'hidden' : 'revert';
+  }, [ showSellModal ]);
 
   return (
     <SellModal
       id={id}
       sellHandler={sell}
-      closeHandler={toggleSelling}
+      closeHandler={toggleSellModal}
       clearHandler={clearHandler}
       items={selected}
-      open={selling}
+      open={showSellModal}
       multiplyModifier={multiplyModifier}
       priceModifier={priceModifier}
       setPriceModifier={(e): void => setPriceModifier(e.target.value)}
