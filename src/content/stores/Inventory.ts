@@ -61,10 +61,12 @@ export class Inventory {
 
   @action.bound async sell(): Promise<void> {
     const pageWindow = getOriginalWindow(window);
-    const { g_sessionId: sessionId } = pageWindow;
-    this.items.selected.forEach((item) => {
-      const { appId, contextId, assetId, price } = item;
-      sellItem({ appId, contextId, assetId, price: String(price), sessionId }).then(result => console.log(result));
+    const { g_sessionID: sessionId } = pageWindow;
+    
+    this.items.selected.forEach(({ appId, contextId, assetId, price, marketHashName }) => {
+      sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
+        .then(() => this.rootStore.logger.log({ tag: 'Selling', message: `${marketHashName} with price ${price} set` }))
+        .catch(() => this.rootStore.logger.log({ tag: 'Error', message: `[X] Failed to sell ${marketHashName}` }));
     });
   }
 

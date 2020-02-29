@@ -64,13 +64,24 @@ export const sellItem = ({
   amount = '1',
   price,
 }: Partial<APIRequestParams>): Promise<Record<string, any>> => {
-  const requestData = { sessionid, appid, contextid, assetid, amount, price };
+  const requestData = new FormData();
+  Object.entries({
+    sessionid,
+    appid,
+    contextid,
+    assetid,
+    amount,
+    price,
+  }).forEach(([key, value]) =>  requestData.append(key, value));
   const requestConfig: RequestInit = {
     method: 'POST',
     cache: 'no-cache',
     mode: 'cors',
-    body: JSON.stringify(requestData),
+    credentials: 'include',
+    body: requestData,
+    referrer: window.location.href,
   };
+  
   return fetch(SELL_URL, requestConfig).then(response => response.json());
 };
 
