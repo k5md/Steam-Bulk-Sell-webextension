@@ -14,16 +14,10 @@ export class OverlayWrapper extends BaseWrapper {
   }
 
   createElement = (itemHolder: Node): void => {
-    // return if itemholder is disabled
-    if (!itemHolder.firstChild) {
-      return; 
-    }
+    if (!itemHolder.firstChild) return; 
 
     const { id: itemId } = itemHolder.firstChild as HTMLElement;
-    // do not create overlay element if it is already present
-    if (this.elements.some((element) => element.id === itemId)) {
-      return;
-    }
+    if (this.elements.some((element) => element.id === itemId)) return;
 
     items.create(itemId);
     const element = {
@@ -46,18 +40,18 @@ export class OverlayWrapper extends BaseWrapper {
       itemHolders.forEach(this.createElement);
       
       // observers for added itemHolders
-      const addedItems = new MutationObserver(mutationsList => mutationsList
-        .filter(({ addedNodes }) => addedNodes.length && (addedNodes[0] as Element).classList.contains('itemHolder'))
-        .forEach(({ addedNodes }) => this.createElement(addedNodes[0]))
-      );
-      const addedPage = new MutationObserver(mutationsList => mutationsList
-        .filter(({ addedNodes }) => addedNodes.length && (addedNodes[0] as Element).classList.contains('inventory_page'))
-        .forEach(({ addedNodes }) => addedNodes[0].childNodes.forEach(this.createElement))
-      );
-      const changedItems = new MutationObserver(mutationsList => mutationsList
-        .filter(({ target }) => (target as Element).classList.contains('item'))
-        .forEach(({ target }) => this.createElement(target.parentNode))
-      );
+      const addedItems = new MutationObserver(mutationsList => mutationsList.forEach(({ addedNodes }) => {
+          if (!addedNodes.length || !(addedNodes[0] as Element).classList.contains('itemHolder')) return;
+          this.createElement(addedNodes[0]);
+      }));
+      const addedPage = new MutationObserver(mutationsList => mutationsList.forEach(({ addedNodes }) => {
+        if (!addedNodes.length || !(addedNodes[0] as Element).classList.contains('inventory_page')) return;
+        addedNodes[0].childNodes.forEach(this.createElement)
+      }));
+      const changedItems = new MutationObserver(mutationsList => mutationsList.forEach(({ target }) => {
+        if (!(target as Element).classList.contains('item')) return;
+        this.createElement(target.parentNode)
+      }));
       
       [addedItems, addedPage, changedItems ].forEach((observer) => {
         observer.observe(this.container, { childList: true, subtree: true });
