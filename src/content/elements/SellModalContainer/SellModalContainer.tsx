@@ -1,4 +1,4 @@
-import React, { useEffect }  from 'react';
+import React, { useEffect, useCallback }  from 'react';
 import { observer } from 'mobx-react-lite';
 import { SellModal } from '../';
 import { useInventory, useItems } from 'content/hooks';
@@ -19,10 +19,15 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
     total,
   } = useItems();
 
-  const clearHandler = (): void => {
+  const clearHandler = useCallback((): void => {
     clear();
     toggleSellModal();
-  };
+  }, []);
+
+  const sellHandler = useCallback((): void => {
+    sell();
+    toggleSellModal();
+  }, []);
 
   useEffect(() => {
     document.body.style.overflowY = showSellModal ? 'hidden' : 'revert';
@@ -31,7 +36,7 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
   return (
     <SellModal
       id={id}
-      sellHandler={sell}
+      sellHandler={sellHandler}
       closeHandler={toggleSellModal}
       clearHandler={clearHandler}
       items={selected}

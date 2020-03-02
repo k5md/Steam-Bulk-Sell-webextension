@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx';
 import { isUndefined } from 'lodash';
 import { getPrice, getIconUrl, sellItem } from 'content/API';
-import { getOriginalWindow } from 'utils';
+import { getOriginalWindow, reflectAll } from 'utils';
 import { Items, ItemConstructorParameter, RootStore } from './';
 
 export class Inventory {
@@ -61,13 +61,17 @@ export class Inventory {
 
   @action.bound async sell(): Promise<void> {
     const pageWindow = getOriginalWindow(window);
-    const { g_sessionID: sessionId } = pageWindow;
+    const { g_sessionID: sessionId, ReloadCommunityInventory } = pageWindow;
     
-    this.items.selected.forEach(({ appId, contextId, assetId, price, marketHashName }) => {
-      sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
+    
+    const selling = this.items.selected.map(({ appId, contextId, assetId, price, marketHashName }) => {
+      return sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
         .then(() => this.rootStore.logger.log({ tag: 'Selling', message: `${marketHashName} with price ${price} set` }))
         .catch(() => this.rootStore.logger.log({ tag: 'Error', message: `[X] Failed to sell ${marketHashName}` }));
     });
+
+    await reflectAll(selling);
+    ReloadCommunityInventory();
   }
 
   @action toggleSellModal = (): void => {

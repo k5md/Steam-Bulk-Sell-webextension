@@ -28,3 +28,15 @@ export const getOriginalWindow = (window: Window): any => new Proxy(window.wrapp
     return XPCNativeWrapper(target[property]);
   }
 });
+
+export type reflectStatus = 'resolved' | 'rejected';
+
+export const reflect = <T>(promise: Promise<T>): Promise<{res: T; status: reflectStatus}> => promise
+  .then((res) => ({ res, status: 'resolved' as reflectStatus }))
+  .catch((res) => ({ res, status: 'rejected' as reflectStatus }));
+
+export const reflectAll = <T>(promises: Promise<T>[]): Promise<{res: T; status: reflectStatus}[]>=> {
+  const reflected = promises.map(reflect);
+  const settled = Promise.all(reflected);
+  return settled;
+}
