@@ -10,6 +10,11 @@
     "description": "Button title for controls panel that brings up the confirmation modal"
   },
 
+  "controls_button_toggle_visible": {
+    "message": "Toggle visible items",
+    "description": "Button title for controls panel that sets checkboxes on the current inventory page checked, if there are ANY unchecked, and sets all unchecked if all are checked"
+  },
+
 
   "modal_button_clear": {
     "message": "Clear",

@@ -15,3 +15,4 @@ export const BUTTON_PRIMARY = 'btn_darkblue_white_innerfade btn_medium';
 export const BUTTON_SECONDARY = 'btn_grey_white_innerfade btn_medium';
 export const TAB_CONTENT = '#tabcontent_inventory';
 export const INVENTORY_PAGECONTROLS = '#inventory_pagecontrols';
+export const INVENTORIES = '#inventories';

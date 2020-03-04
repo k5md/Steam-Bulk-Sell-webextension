@@ -11,7 +11,7 @@ export class Items {
   @observable _priceModifier = 'median'
 
   @computed get selected(): Item[] {
-    return Object.values(this.items).filter((item: Item) => item.selected);
+    return Object.values(this.items).filter((item: Item) => item.selected && item.initialized);
   }
 
   @action clear = (): void => {

@@ -1,12 +1,13 @@
 import { observable, action } from 'mobx';
-import { isUndefined } from 'lodash';
+import { isUndefined, random } from 'lodash';
 import { getPrice, getIconUrl, sellItem } from 'content/API';
-import { getOriginalWindow, reflectAll } from 'utils';
+import { getOriginalWindow, reflectAll, timeout, DeferredRequests } from 'utils';
 import { Items, ItemConstructorParameter, RootStore } from './';
 
 export class Inventory {
   @observable items: Items;
   @observable showSellModal = false;
+  requests = new DeferredRequests();
 
   constructor(public rootStore: RootStore) {
     this.items = new Items(rootStore);
@@ -30,18 +31,22 @@ export class Inventory {
       },
     } = assets[assetId];
 
-    const {
+    /*const {
       median_price: midPrice,
       lowest_price: lowPrice,
-    } = await getPrice({ countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) });
+    } = await this.requests.defer({
+      request: (): Promise<any> => getPrice({ countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) }),
+      delay: 1000,
+    })
 
     if ([ midPrice, lowPrice ].every(isUndefined)) {
       this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory price lookup failed' });
       return Promise.reject();
-    }
+    }*/
+    const lowPrice = '0', midPrice = '0';
 
     const price = isUndefined(midPrice) ? lowPrice : midPrice;
-  
+
     const itemData = {
       itemId,
       appId,
@@ -63,15 +68,26 @@ export class Inventory {
     const pageWindow = getOriginalWindow(window);
     const { g_sessionID: sessionId, ReloadCommunityInventory } = pageWindow;
     
-    
-    const selling = this.items.selected.map(({ appId, contextId, assetId, price, marketHashName }) => {
-      return sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
-        .then(() => this.rootStore.logger.log({ tag: 'Selling', message: `${marketHashName} with price ${price} set` }))
-        .catch(() => this.rootStore.logger.log({ tag: 'Error', message: `[X] Failed to sell ${marketHashName}` }));
-    });
+    // NOTE: steam will almost always send some sort of response, it's either empty array or an object with
+    // success field with boolean value, and some other random fields, for the sake of consistency
+    // NOTE: set some timeout on requests, otherwise all of them will 'fail' except for the first one
+    const delayStep = 2000; // ms
+    const sellRequests = this.items.selected.map(({ appId, contextId, assetId, price, marketHashName }, index) => timeout(
+      () => sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
+        .then((value) => {
+          if (!value.success) throw value;
+          this.rootStore.logger.log({ tag: 'Selling', message: `${marketHashName} with price ${price} set` });
+          return value;
+        })
+        .catch((reason) => {
+          this.rootStore.logger.log({ tag: 'Failed', message: `[X] Sell ${marketHashName}, reason: ${JSON.stringify(reason)}` });
+          return reason;
+        }),
+      index * delayStep + random(0, 1000),
+    ));
 
-    await reflectAll(selling);
-    ReloadCommunityInventory();
+    await reflectAll(sellRequests);
+    ReloadCommunityInventory()
   }
 
   @action toggleSellModal = (): void => {

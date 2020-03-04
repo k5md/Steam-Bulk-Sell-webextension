@@ -16,16 +16,17 @@ export type ItemConstructorParameter = {
 }
 
 export class Item implements ItemConstructorParameter{
-  @observable selected = false
-  initialized = false
   rootStore;
+
+  @observable selected = false
+  @observable initialized = false
   @observable _price;
 
   itemId: string;
   appId: string;
   contextId: string;
   assetId: string;
-  marketHashName: string;
+  marketHashName = '';
   marketHashNameEncoded: string;
   currencyId: string;
   marketPrice: string;
@@ -45,13 +46,10 @@ export class Item implements ItemConstructorParameter{
   @action.bound async initialize(): Promise<void> {
     const itemData: ItemConstructorParameter = await this.rootStore.inventory.fetch(this.itemId);
     Object.assign(this, itemData);
+    this.initialized = true;
   }
 
   @action.bound async setSelected(selected: boolean): Promise<void> {
-    if (!this.initialized) {
-      await this.initialize();
-      this.initialized = true;
-    }
     this.selected = selected;
     this.rootStore.logger.log({ tag: selected ? 'Checked' : 'Unchecked', message: this.marketHashName });
   }

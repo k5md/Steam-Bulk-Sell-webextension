@@ -1,0 +1,13 @@
+.controls__container {
+  display: flex;
+  flex-direction: row;
+
+  @media (min-width: 560) {
+    flex-direction: column;
+  }
+}
+
+.controls__button {
+  margin-top: 10px;
+  margin-left: 10px
+}
