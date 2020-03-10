@@ -39,6 +39,8 @@ export class Inventory {
       delay: 1000,
     })
 
+    console.log(this.requests, midPrice, lowPrice);
+
     if ([ midPrice, lowPrice ].every(isUndefined)) {
       this.rootStore.logger.log({ tag: 'Error', message: '[X] Inventory price lookup failed' });
       return Promise.reject();

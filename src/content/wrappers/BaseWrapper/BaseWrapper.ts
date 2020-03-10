@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom';
-import { identity } from 'lodash';
+import { identity, uniqueId } from 'lodash';
+import { EXTENSION_NAME } from 'content/constants';
 
 export interface WrapperElement {
   element: JSX.Element;
@@ -17,6 +18,7 @@ export class BaseWrapper {
 
   public mountElement({ element, selector = identity }: WrapperElement): HTMLElement {
     const wrapper = document.createElement('div');
+    wrapper.id = uniqueId(EXTENSION_NAME);
     const target = selector(this.container);
     if (!target) {
       return null;

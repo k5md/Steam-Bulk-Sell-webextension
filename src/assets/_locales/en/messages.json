@@ -57,6 +57,15 @@
     }
   },
 
+  "modal_price_loading": {
+    "message": "Fetching price...",
+    "description": "Message shown while item price is being fetched"
+  },
+
+  "modal_wait": {
+    "message": "Wait..."
+  },
+
   "modal_items_empty": {
     "message": "No items selected",
     "description": "Text displayed in modal when no items were selected to be sold"

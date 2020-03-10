@@ -1,0 +1,14 @@
+.indicator_container {
+  display: flex;
+  align-items: center;
+}
+
+.indicator_progress {
+  width: 16px;
+  height: 16px;
+  display: flex;
+}
+
+.indicator_text {
+  padding: 0 10px;
+}

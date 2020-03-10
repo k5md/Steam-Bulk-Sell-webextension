@@ -20,6 +20,7 @@ export class Item implements ItemConstructorParameter{
 
   @observable selected = false
   @observable initialized = false
+  @observable priceFetched = false
   @observable _price;
 
   itemId: string;

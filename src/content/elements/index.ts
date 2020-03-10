@@ -6,3 +6,4 @@ export * from './Checkbox';
 export * from './ControlsContainer';
 export * from './SellModalContainer';
 export * from './CheckboxContainer';
+export * from './LoadingIndicator';

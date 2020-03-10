@@ -4,8 +4,8 @@ import { useLogger, useInventory } from 'content/hooks';
 import { Controls, Logger } from '../';
 
 export interface Props {
-  id: string;
   toggleVisible: () => void;
+  id?: string;
 }
 
 export const ControlsContainer: React.FC<Props> = observer(({ id, toggleVisible }) => {
