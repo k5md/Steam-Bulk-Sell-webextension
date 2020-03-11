@@ -10,12 +10,12 @@ export interface Props {
 
 export const ControlsContainer: React.FC<Props> = observer(({ id, toggleVisible }) => {
   const { logs } = useLogger();
-  const { toggleSellModal } = useInventory();
+  const { toggleSellModal, selling } = useInventory();
 
   return (
     <div id={id}>
       <Logger>{logs}</Logger>
-      <Controls sellHandler={toggleSellModal} toggleVisible={toggleVisible} />
+      <Controls sellHandler={toggleSellModal} toggleVisible={toggleVisible} selling={selling} />
     </div>
   );
 });

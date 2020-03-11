@@ -8,6 +8,7 @@ export class Inventory {
   @observable items: Items;
   @observable showSellModal = false;
   requests = new DeferredRequests();
+  @observable selling = false;
 
   constructor(public rootStore: RootStore) {
     this.items = new Items(rootStore);
@@ -88,7 +89,9 @@ export class Inventory {
       index * delayStep + random(0, 1000),
     ));
 
+    this.selling = true;
     await reflectAll(sellRequests);
+    this.selling = false;
     ReloadCommunityInventory()
   }
 

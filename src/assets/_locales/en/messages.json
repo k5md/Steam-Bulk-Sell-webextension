@@ -15,6 +15,11 @@
     "description": "Button title for controls panel that sets checkboxes on the current inventory page checked, if there are ANY unchecked, and sets all unchecked if all are checked"
   },
 
+  "controls_selling": {
+    "message": "Selling items, wait...",
+    "description": "Text on button placeholder when selected items are being sold"
+  },
+
 
   "modal_button_clear": {
     "message": "Clear",

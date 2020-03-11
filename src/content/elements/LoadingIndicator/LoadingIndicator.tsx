@@ -14,7 +14,7 @@ export const LoadingIndicator: React.FC<Props> = ({ text, indicator, className }
       <img src={indicator} />
     </div>
     <div className={styles.indicator_text}>
-      <p>{text}</p>
+      <span>{text}</span>
     </div>
   </div>
 );

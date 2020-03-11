@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import cn from 'classnames';
 import { BUTTON_SECONDARY, BUTTON_PRIMARY } from 'content/constants';
+import Button from 'react-bootstrap/Button';
 import styles from './index.scss';
 
 export type SellModalControlsProps  = {
@@ -66,25 +67,15 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
       </div>
     </div>
     <div className={styles.modal_sell__buttons}>
-      <input
-        type="button" 
-        value={browser.i18n.getMessage('modal_button_clear')}
-        className={cn(BUTTON_SECONDARY, styles.modal_sell__button)}
-        onClick={clearHandler}
-      />
-      <input
-        type="button"
-        value={browser.i18n.getMessage('modal_button_close')}
-        className={cn(BUTTON_SECONDARY, styles.modal_sell__button)}
-        onClick={closeHandler}
-      />
-      <input
-        type="button"
-        value={browser.i18n.getMessage(fetchedItems ? 'modal_button_sell' : 'modal_wait')}
-        className={cn(BUTTON_PRIMARY, styles.modal_sell__button)}
-        onClick={sellHandler}
-        disabled={!fetchedItems}
-      />
+      <Button onClick={clearHandler} className={cn(BUTTON_SECONDARY, styles.modal_sell__button)}>
+        <span>{browser.i18n.getMessage('modal_button_clear')}</span>
+      </Button>
+      <Button onClick={closeHandler} className={cn(BUTTON_SECONDARY, styles.modal_sell__button)}>
+        <span>{browser.i18n.getMessage('modal_button_close')}</span>
+      </Button>
+      <Button onClick={sellHandler} className={cn(BUTTON_PRIMARY, styles.modal_sell__button)} disabled={!fetchedItems}>
+        <span>{browser.i18n.getMessage(fetchedItems ? 'modal_button_sell' : 'modal_wait')}</span>
+      </Button>
     </div>
   </div>
 ));
