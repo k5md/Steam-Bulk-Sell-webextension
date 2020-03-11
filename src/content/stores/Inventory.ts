@@ -79,11 +79,17 @@ export class Inventory {
       () => sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
         .then((value) => {
           if (!value.success) throw value;
-          this.rootStore.logger.log({ tag: 'Selling', message: `${marketHashName} with price ${price} set` });
+          this.rootStore.logger.log({
+            tag: '✓',
+            message: `${marketHashName}, ${price}`,
+          });
           return value;
         })
         .catch((reason) => {
-          this.rootStore.logger.log({ tag: 'Failed', message: `[X] Sell ${marketHashName}, reason: ${JSON.stringify(reason)}` });
+          this.rootStore.logger.log({
+            tag: 'X',
+            message: `${marketHashName}, ${JSON.stringify(reason)}`,
+          });
           return reason;
         }),
       index * delayStep + random(0, 1000),

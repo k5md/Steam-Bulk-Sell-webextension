@@ -17,7 +17,10 @@ export class SellModalWrapper extends BaseWrapper {
       this.container = container;
       this.elements = [{ element: <SellModalContainer id={`${EXTENSION_NAME}-Modal`} /> }];
       this.render();
-      log({ tag: 'Init', message: '[✓] Modal wrapper' });
+      log({
+        tag: '✓',
+        message: browser.i18n.getMessage("logger_modal_wrapper"),
+      });
     });
   }
 }

@@ -107,5 +107,26 @@
   "guide_issues_link": {
     "message": "create a new issue on github",
     "description": "Second part of the message, link text"
+  },
+
+
+  "logger_modal_wrapper": {
+    "message": "Modal wrapper"
+  },
+
+  "logger_controls_wrapper": {
+    "message": "Controls wrapper"
+  },
+
+  "logger_overlay_wrapper": {
+    "message": "Overlay wrapper"
+  },
+
+  "logger_overlay_checked": {
+    "message": "Checked"
+  },
+
+  "logger_overlay_unchecked": {
+    "message": "Unchecked"
   }
 }

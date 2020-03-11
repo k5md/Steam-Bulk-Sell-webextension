@@ -66,7 +66,6 @@ export class OverlayWrapper extends BaseWrapper {
         }
         // ReloadCommunityInventory call
         if ((target as Element).id === 'inventories' && addedNodes.length && (addedNodes[0] as Element).id.startsWith('inventory')) {
-          console.log('reload', mutation);
           this.reset();
           this.elements = [];
           const activeInventory = document.querySelector(INVENTORIES_WRAPPER).querySelector(ACTIVE_INVENTORY);
@@ -91,7 +90,10 @@ export class OverlayWrapper extends BaseWrapper {
       });
       this.disposers.push(() => observer.disconnect());
 
-      log({ tag: 'Init', message: '[✓] Overlay' });
+      log({
+        tag: '✓',
+        message: browser.i18n.getMessage("logger_overlay_wrapper"),
+      });
     });
   }
 }
