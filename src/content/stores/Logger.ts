@@ -5,7 +5,6 @@ import { RootStore } from './';
 
 export interface LoggerEntry {
   message: string;
-  tag?: string;
   id?: string;
 }
 
@@ -14,7 +13,7 @@ export class Logger {
 
   constructor(public rootStore: RootStore) {}
 
-  @action log = (entry: LoggerEntry): void => {
-    this.logs.push({ ...entry, id: uniqueId(`${EXTENSION_NAME}-Logger-`)});
+  @action log = (message: LoggerEntry["message"]): void => {
+    this.logs.push({ message, id: uniqueId(`${EXTENSION_NAME}-Logger-`)});
   }
 }

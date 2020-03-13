@@ -16,8 +16,8 @@ export const Logger = observer(({ children }: Props) => {
 
   return (
     <div className={styles.logger__container} ref={loggerRef}>
-      {children.map(({ tag, message, id }) => (
-        <pre key={id}>{`[${tag}]: ${message}`}</pre>
+      {children.map(({ message, id }) => (
+        <pre key={id}>{message}</pre>
       ))}
     </div>
   );

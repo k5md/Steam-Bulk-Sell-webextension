@@ -90,10 +90,7 @@ export class OverlayWrapper extends BaseWrapper {
       });
       this.disposers.push(() => observer.disconnect());
 
-      log({
-        tag: '✓',
-        message: browser.i18n.getMessage("logger_overlay_wrapper"),
-      });
+      log(`[✓] ${browser.i18n.getMessage("logger_overlay_wrapper")}`);
     });
   }
 }

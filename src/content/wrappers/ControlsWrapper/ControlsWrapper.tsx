@@ -69,10 +69,7 @@ export class ControlsWrapper extends BaseWrapper {
       this.container = container;
       this.elements = [{ element: <ControlsContainer id={`${EXTENSION_NAME}-Controls`} toggleVisible={this.toggleVisible} /> }];
       this.render();   
-      log({
-        tag: '✓',
-        message: browser.i18n.getMessage("logger_controls_wrapper"),
-      });
+      log(`[✓] ${browser.i18n.getMessage("logger_controls_wrapper")}`);
     });
 
     checkElements(INVENTORY_PAGE_TABS).then((inventoryPageTabs) => {

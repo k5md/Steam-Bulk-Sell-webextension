@@ -52,10 +52,8 @@ export class Item implements ItemConstructorParameter{
 
   @action.bound async setSelected(selected: boolean): Promise<void> {
     this.selected = selected;
-    this.rootStore.logger.log({
-      tag: browser.i18n.getMessage(selected ? 'logger_overlay_checked' : 'logger_overlay_unchecked'),
-      message: this.marketHashName,
-    });
+    const statusMessage = browser.i18n.getMessage(selected ? 'logger_overlay_checked' : 'logger_overlay_unchecked');
+    this.rootStore.logger.log(`[${statusMessage}] ${this.marketHashName}`);
   }
 
   @action.bound async toggleSelected(): Promise<void> {

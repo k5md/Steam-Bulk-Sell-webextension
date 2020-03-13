@@ -44,30 +44,33 @@ export const reflectAll = <T>(promises: Promise<T>[]): Promise<{res: T; status: 
 }
 
 // Promise timeout
-export const timeout = <T>(f: () => T | Promise<T>, delay: number): Promise<T> => {
+export const timeout = <T>(f: () => Promise<T>, delay: number): Promise<T> => {
   return new Promise((resolve) => setTimeout(() => resolve(f()), delay));
 };
 
-// Allows send requests with a timeout after the latest request has been sent
+// Promise reject only after n retries
+export const retry = <T>(f: () => Promise<T>, retries: number): Promise<T> => {
+  return f().catch(err => retries <= 0 ? Promise.reject(err) : retry(f, retries - 1));
+}
+
+// Allows to send requests with a timeout after the latest request has been sent,
+// Supports retry on reject
 export class DeferredRequests {
   constructor(
     private requests = {},
   ) {}
 
-  defer<T>({ request, delay }: { request: <T>() => Promise<T>; delay: number }): Promise<T> {
+  defer<T>(request: <T>() => Promise<T>, delay = 1000, retries = 3): Promise<T> {
+    console.log(this.requests);
     const id = uniqueId();
     const queueLength = Object.keys(this.requests).length
-    const execution = timeout<T>(request, delay * queueLength)
-      .then(res => {
+    const timedOut = () => timeout<T>(request, delay * queueLength);
+    const execution = retry<T>(timedOut, retries)
+      .finally(() => {
         delete this.requests[id];
-        return res;
-      })
-      .catch(err => {
-        delete this.requests[id];
-        return err;
       });
     
     this.requests[id] = execution;
-    return this.requests[id];
+    return execution;
   }
 }

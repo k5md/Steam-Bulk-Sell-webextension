@@ -17,13 +17,33 @@ export type APIRequestParams = {
   amount: string;
 }
 
+export type Description = {
+  market_hash_name: string;
+  market_name: string;
+  icon_url: string;
+  appid: string;
+  classid: string;
+}
+
+export type Asset = {
+  appid: number;
+  assetid: string;
+  contextid: string;
+  classid: string;
+}
+
+export interface SteamInventory {
+  descriptions: Array<Description>;
+  assets: Array<Asset>;
+}
+
 export const getInventory = ({
   steamId,
   appId,
   contextId,
   countryCode,
   itemsCount,
-}: Partial<APIRequestParams>): Promise<Record<string, any>> => {
+}: Partial<APIRequestParams>): Promise<SteamInventory> => {
   const path = [ INVENTORY_URL, steamId, appId, contextId ].join('/');
   const search = new URLSearchParams({
     l: countryCode,
