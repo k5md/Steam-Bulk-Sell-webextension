@@ -2,7 +2,7 @@ import { observable, action } from 'mobx';
 import { isUndefined, random } from 'lodash';
 import { getPrice, getIconUrl, sellItem, getInventory, SteamInventory, Description, Asset } from 'content/API';
 import { getOriginalWindow, reflectAll, timeout, DeferredRequests } from 'utils';
-import { Items, ItemConstructorParameter, RootStore } from './';
+import { Items, ItemConstructorParameter, RootStore, Item } from './';
 
 
 
@@ -54,33 +54,13 @@ export class Inventory {
   @action.bound async fetch(itemId: string): Promise<ItemConstructorParameter> {
     const [ appId, contextId, assetId ] = itemId.split('_');
     const pageWindow = getOriginalWindow(window);
-    const {
-      g_strCountryCode: countryCode,
-      g_rgWalletInfo: { wallet_currency: currencyId },
-    } = pageWindow;
+    const { g_rgWalletInfo: { wallet_currency: currencyId }} = pageWindow;
     
     const {
       market_hash_name: marketHashName,
       market_name: marketName,
       icon_url: iconUrl,
     } = await this.getItemDescription(itemId);
-
-    /*const {
-      median_price: midPrice,
-      lowest_price: lowPrice,
-    } = await this.requests.defer((): Promise<any> => getPrice({ countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) }),
-      2000
-    );
-
-    console.log(this.requests, midPrice, lowPrice);
-
-    if ([ midPrice, lowPrice ].every(isUndefined)) {
-      this.rootStore.logger.log('[X] Inventory price lookup failed');
-      return Promise.reject();
-    }*/
-    const lowPrice = '0', midPrice = '0';
-
-    const price = isUndefined(midPrice) ? lowPrice : midPrice;
 
     const itemData = {
       itemId,
@@ -90,13 +70,40 @@ export class Inventory {
       marketHashName,
       marketHashNameEncoded: encodeURIComponent(marketHashName),
       currencyId,
-      marketPrice: price.split(' ')[0].replace(',', '.'),
-      currency: price.split(' ')[1],
+      marketPrice: '0',
+      currency: '',
       marketName,
       iconUrl: getIconUrl(iconUrl),
     };
   
     return itemData;
+  }
+
+  @action.bound async getItemPrice(itemId: string): Promise<Partial<Item>> {
+    const [ appId ] = itemId.split('_');
+    const pageWindow = getOriginalWindow(window);
+    const {
+      g_strCountryCode: countryCode,
+      g_rgWalletInfo: { wallet_currency: currencyId },
+    } = pageWindow;
+    const { market_hash_name: marketHashName } = await this.getItemDescription(itemId);
+    const itemParams = { countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) };
+    const { 
+      median_price: midPrice,
+      lowest_price: lowPrice,
+    } = await this.requests.defer((): Promise<any> => getPrice(itemParams), 2000);
+    const price = isUndefined(midPrice) ? lowPrice : midPrice;
+
+    if ([ midPrice, lowPrice ].every(isUndefined)) {
+      const errorMessage = browser.i18n.getMessage('logger_inventory_price_failed');
+      this.rootStore.logger.log(`[X] ${errorMessage}`);
+      return Promise.reject(errorMessage);
+    }
+
+    return {
+      marketPrice: price.split(' ')[0].replace(',', '.'),
+      currency: price.split(' ')[1],
+    };
   }
 
   @action.bound async sell(): Promise<void> {
@@ -106,20 +113,21 @@ export class Inventory {
     // NOTE: steam will almost always send some sort of response, it's either empty array or an object with
     // success field with boolean value, and some other random fields, for the sake of consistency
     // NOTE: set some timeout on requests, otherwise all of them will 'fail' except for the first one
-    const delayStep = 2000; // ms
-    const sellRequests = this.items.selected.map(({ appId, contextId, assetId, price, marketHashName }, index) => timeout(
-      () => sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
-        .then((value) => {
-          if (!value.success) throw value;
-          this.rootStore.logger.log(`[✓] ${marketHashName}, ${price}`);
-          return value;
-        })
-        .catch((reason) => {
-          this.rootStore.logger.log(`[X] ${marketHashName}, ${JSON.stringify(reason)}`);
-          return reason;
-        }),
-      index * delayStep + random(0, 1000),
-    ));
+    const sellRequests = this.items.selected
+      .filter(item => !item.error)
+      .map(({ appId, contextId, assetId, price, marketHashName }) => 
+        this.requests.defer((): Promise<any> => sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
+          .then((value) => {
+            if (!value.success) throw value;
+            this.rootStore.logger.log(`[✓] ${marketHashName}, ${price}`);
+            return value;
+          })
+          .catch((reason) => {
+            this.rootStore.logger.log(`[X] ${marketHashName}, ${JSON.stringify(reason)}`);
+            throw reason;
+          })
+        )
+      );
 
     this.selling = true;
     await reflectAll(sellRequests);

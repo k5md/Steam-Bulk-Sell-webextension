@@ -128,5 +128,9 @@
 
   "logger_overlay_unchecked": {
     "message": "Unchecked"
+  },
+
+  "logger_inventory_price_failed": {
+    "message": "Inventory price lookup failed"
   }
 }

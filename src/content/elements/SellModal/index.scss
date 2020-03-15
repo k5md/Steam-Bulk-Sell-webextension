@@ -5,6 +5,7 @@
 .modal_sell__items {
   overflow-y: auto;
   flex-grow: 9000;
+  order: 1;
 }
 
 .modal_sell__controls {
@@ -13,6 +14,7 @@
   justify-content: space-evenly;
   background-color: #181818;
   align-items: center;
+  order: 4;
 
   @media (min-width: 560px) {
     flex-direction: row;
@@ -40,6 +42,7 @@
 .modal_sell__divider {
   border-bottom: 1px solid grey;
   margin: 10px;
+  order: 2;
 
   &:before {
     content: '';
@@ -57,6 +60,7 @@
   display: flex;
   justify-content: end;
   padding: 0 10px;
+  order: 3;
 }
 
 .modal_items__empty {

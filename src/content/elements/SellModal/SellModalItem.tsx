@@ -18,14 +18,16 @@ export const SellModalItem: React.FC<SellModalItemProps> = observer(({
     itemId,
     setPrice,
     priceFetched,
+    error,
   },
   priceModifier,
 }) => {
-  const renderedPrice = (priceFetched
+  const renderedPrice = error ? error : (priceFetched
     ? <React.Fragment>
         <input
           type="text"
           pattern="[0-9]+([\.][0-9]{1,})?"
+          size={8}
           value={price}
           readOnly={priceModifier !== 'custom'}
           onInput={(e: React.ChangeEvent<HTMLInputElement>): void => setPrice(e.target.value)}

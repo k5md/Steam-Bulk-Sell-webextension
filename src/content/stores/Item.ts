@@ -21,7 +21,10 @@ export class Item implements ItemConstructorParameter{
   @observable selected = false
   @observable initialized = false
   @observable priceFetched = false
-  @observable _price;
+  _price;
+  @observable marketPrice = ''
+  @observable currency = ''
+  @observable error = '';
 
   itemId: string;
   appId: string;
@@ -30,8 +33,7 @@ export class Item implements ItemConstructorParameter{
   marketHashName = '';
   marketHashNameEncoded: string;
   currencyId: string;
-  marketPrice: string;
-  currency: string;
+
   marketName: string;
   iconUrl: string;
 
@@ -54,6 +56,16 @@ export class Item implements ItemConstructorParameter{
     this.selected = selected;
     const statusMessage = browser.i18n.getMessage(selected ? 'logger_overlay_checked' : 'logger_overlay_unchecked');
     this.rootStore.logger.log(`[${statusMessage}] ${this.marketHashName}`);
+    if (this.priceFetched) {
+      return;
+    }
+    this.rootStore.inventory.getItemPrice(this.itemId).then(({ marketPrice, currency }) => {
+      this.marketPrice = marketPrice;
+      this.currency = currency;
+      this.priceFetched = true;
+    }).catch((error) => {
+      this.error = error;
+    })
   }
 
   @action.bound async toggleSelected(): Promise<void> {

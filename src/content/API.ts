@@ -72,7 +72,7 @@ export const getPrice = ({
     cache: 'no-cache',
     mode: "cors",
   };
-  return fetch(url, requestConfig).then(response => { debugger; return response.json()});
+  return fetch(url, requestConfig).then(response => response.json());
 };
 
 // NOTE: nice following naming conventions, use all lowercase in request

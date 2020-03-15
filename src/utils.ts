@@ -61,7 +61,6 @@ export class DeferredRequests {
   ) {}
 
   defer<T>(request: <T>() => Promise<T>, delay = 1000, retries = 3): Promise<T> {
-    console.log(this.requests);
     const id = uniqueId();
     const queueLength = Object.keys(this.requests).length
     const timedOut = () => timeout<T>(request, delay * queueLength);

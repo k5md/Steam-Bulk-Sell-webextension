@@ -46,7 +46,7 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
       setPriceModifier={(e): void => setPriceModifier(e.target.value)}
       setMultiplyModifier={(e): void => setMultiplyModifier(e.target.value)}
       total={total}
-      fetchedItems={selected.every(item => item.priceFetched)}
+      fetchedItems={selected.every(item => item.priceFetched || item.error)}
     />
   );
 });
