@@ -1,6 +1,11 @@
 # Steam Bulk Sell
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/ef1118bb20e47d32b77b/maintainability)](https://codeclimate.com/github/k5md/Steam-Bulk-Sell-webextension/maintainability)
+[![Build Status](https://travis-ci.com/k5md/Steam-Bulk-Sell-webextension.svg?token=ZSWp3q2qzbTb4nzaxqWy&branch=master)](https://travis-ci.com/k5md/Steam-Bulk-Sell-webextension)
+
 Steam Bulk Sell is a web-extension for Firefox to help selling multiple inventory items at once. It allows one to select multiple items, use prices presets (median, median * multiplier, custom) and sell them.
+
+[Addon page on mozilla.org](https://addons.mozilla.org/ru/firefox/addon/steam-bulk-sell/)
 
 ## How to use
 
