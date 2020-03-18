@@ -126,7 +126,7 @@ export class Inventory {
             this.rootStore.logger.log(`[X] ${marketHashName}, ${JSON.stringify(reason)}`);
             throw reason;
           })
-        )
+        , 2000)
       );
 
     this.selling = true;
