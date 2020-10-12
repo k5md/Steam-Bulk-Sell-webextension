@@ -49,10 +49,11 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
         />
         <input
           type="text"
-          pattern="[0-9]{1,3}"
+          pattern="[0-9]+([\.][0-9]{1,})?"
           value={multiplyModifier}
           onInput={setMultiplyModifier}
           className={styles.modal_sell__multiply_number}
+          title={browser.i18n.getMessage('modal_price_modifier_multiply_tooltip')}
         />
       </div>
       <div>

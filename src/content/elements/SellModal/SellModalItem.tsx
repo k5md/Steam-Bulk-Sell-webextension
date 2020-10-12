@@ -31,7 +31,9 @@ export const SellModalItem: React.FC<SellModalItemProps> = observer(({
           value={price}
           readOnly={priceModifier !== 'custom'}
           onInput={(e: React.ChangeEvent<HTMLInputElement>): void => setPrice(e.target.value)}
+          title={browser.i18n.getMessage('modal_price_tooltip')}
         />
+        &nbsp;
         <div>{currency}</div>
       </React.Fragment>
     : <LoadingIndicator

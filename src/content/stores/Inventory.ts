@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx';
-import { isUndefined, random } from 'lodash';
+import { isUndefined } from 'lodash';
 import { getPrice, getIconUrl, sellItem, getInventory, SteamInventory, Description, Asset } from 'content/API';
 import { getOriginalWindow, reflectAll, timeout, DeferredRequests } from 'utils';
 import { Items, ItemConstructorParameter, RootStore, Item } from './';
@@ -70,7 +70,7 @@ export class Inventory {
       marketHashName,
       marketHashNameEncoded: encodeURIComponent(marketHashName),
       currencyId,
-      marketPrice: '0',
+      steamMarketPrice: '',
       currency: '',
       marketName,
       iconUrl: getIconUrl(iconUrl),
@@ -85,6 +85,9 @@ export class Inventory {
     const {
       g_strCountryCode: countryCode,
       g_rgWalletInfo: { wallet_currency: currencyId },
+      g_rgCurrencyData,
+      GetCurrencyCode,
+      GetPriceValueAsInt,
     } = pageWindow;
     const { market_hash_name: marketHashName } = await this.getItemDescription(itemId);
     const itemParams = { countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) };
@@ -99,10 +102,12 @@ export class Inventory {
       this.rootStore.logger.log(`[X] ${errorMessage}`);
       return Promise.reject(errorMessage);
     }
+  
+    const currencyCode = GetCurrencyCode(currencyId);
 
     return {
-      marketPrice: price.split(' ')[0].replace(',', '.'),
-      currency: price.split(' ')[1],
+      steamMarketPrice: String(GetPriceValueAsInt(price) / 100),
+      currency: g_rgCurrencyData[currencyCode].strSymbol || currencyCode,
     };
   }
 

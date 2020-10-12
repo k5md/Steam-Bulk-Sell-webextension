@@ -36,6 +36,7 @@ export class Items {
       return;
     }
     this._multiplyModifier = parsed;
+    this.applyPriceModifications();
   }
 
   @computed get priceModifier(): string {
@@ -44,17 +45,22 @@ export class Items {
 
   @action.bound setPriceModifier(value: string): void {
     this._priceModifier = value;
+    this.applyPriceModifications();
   }
 
-  applyPriceModifications = computedFn((value: number): number => {
-    const modified = ({ 
-      median: identity,
-      multiply: (value: number): number => value * this._multiplyModifier,
-      custom: identity,
-    })[this.priceModifier](value);
-    const rounded = floor(modified, 2);
-    return rounded;
-  })
+  @action.bound applyPriceModifications(): void {
+    const getModifiedPrice = ({ 
+      median: (item) => item.initialPrice,
+      multiply: (item) => item.initialPrice * this.multiplyModifier,
+      custom: (item) => item.price,
+    })[this.priceModifier];
+
+    this.selected.forEach((item: Item) => {
+      const modifiedPrice = getModifiedPrice(item);
+      const rounded = floor(modifiedPrice, 2);
+      item.setPrice(rounded);
+    });
+  }
 
   @computed get total(): number {
     return floor(this.selected.reduce((acc, cur) => acc + cur.price, 0), 2);

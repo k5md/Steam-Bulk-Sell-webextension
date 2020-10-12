@@ -9,7 +9,7 @@ export type ItemConstructorParameter = {
    marketHashName: string;
    marketHashNameEncoded: string;
    currencyId: string;
-   marketPrice: string;
+   steamMarketPrice: string;
    currency: string;
    marketName: string;
    iconUrl: string;
@@ -21,9 +21,9 @@ export class Item implements ItemConstructorParameter{
   @observable selected = false
   @observable initialized = false
   @observable priceFetched = false
-  _price;
-  @observable marketPrice = ''
-  @observable currency = ''
+  @observable _price: number;
+  @observable steamMarketPrice = '';
+  @observable currency = '';
   @observable error = '';
 
   itemId: string;
@@ -59,10 +59,11 @@ export class Item implements ItemConstructorParameter{
     if (this.priceFetched) {
       return;
     }
-    this.rootStore.inventory.getItemPrice(this.itemId).then(({ marketPrice, currency }) => {
-      this.marketPrice = marketPrice;
+    this.rootStore.inventory.getItemPrice(this.itemId).then(({ steamMarketPrice, currency }) => {
+      this.steamMarketPrice = steamMarketPrice;
       this.currency = currency;
       this.priceFetched = true;
+      this.setPrice(this.initialPrice);
     }).catch((error) => {
       this.error = error;
     })
@@ -72,16 +73,16 @@ export class Item implements ItemConstructorParameter{
     return this.setSelected(!this.selected);
   }
 
-  @computed get price(): number {
-    if (!this._price) {
-      this._price = parseFloat(this.marketPrice);
-    }
-    const { applyPriceModifications } = this.rootStore.inventory.items;
-    return applyPriceModifications(this._price);
+  @computed get initialPrice(): number {
+    return parseFloat(this.steamMarketPrice);
   }
 
-  @action setPrice = (value: string): void => {
-    const parsed = parseFloat(value);
+  @computed get price(): number {
+    return this._price;
+  }
+
+  @action setPrice = (value: string | number): void => {
+    const parsed = parseFloat(String(value));
 
     if (Number.isNaN(parsed) || parsed < 0) {
       return;
