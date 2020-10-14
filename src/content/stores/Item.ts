@@ -9,7 +9,9 @@ export type ItemConstructorParameter = {
    marketHashName: string;
    marketHashNameEncoded: string;
    currencyId: string;
-   steamMarketPrice: string;
+   steamMarketLowPrice: number;
+   steamMarketMidPrice: number;
+   steamMarketPrice: number;
    currency: string;
    marketName: string;
    iconUrl: string;
@@ -22,7 +24,9 @@ export class Item implements ItemConstructorParameter{
   @observable initialized = false
   @observable priceFetched = false
   @observable _price: number;
-  @observable steamMarketPrice = '';
+  @observable steamMarketLowPrice = 0;
+  @observable steamMarketMidPrice = 0;
+  @observable steamMarketPrice = 0;
   @observable currency = '';
   @observable error = '';
 
@@ -59,7 +63,14 @@ export class Item implements ItemConstructorParameter{
     if (this.priceFetched) {
       return;
     }
-    this.rootStore.inventory.getItemPrice(this.itemId).then(({ steamMarketPrice, currency }) => {
+    this.rootStore.inventory.getItemPrice(this.itemId).then(({
+      steamMarketLowPrice,
+      steamMarketMidPrice,
+      steamMarketPrice,
+      currency,
+    }) => {
+      this.steamMarketLowPrice = steamMarketLowPrice;
+      this.steamMarketMidPrice = steamMarketMidPrice;
       this.steamMarketPrice = steamMarketPrice;
       this.currency = currency;
       this.priceFetched = true;
@@ -74,7 +85,7 @@ export class Item implements ItemConstructorParameter{
   }
 
   @computed get initialPrice(): number {
-    return parseFloat(this.steamMarketPrice);
+    return this.steamMarketPrice;
   }
 
   @computed get price(): number {

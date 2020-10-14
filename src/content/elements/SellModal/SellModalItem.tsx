@@ -19,11 +19,17 @@ export const SellModalItem: React.FC<SellModalItemProps> = observer(({
     setPrice,
     priceFetched,
     error,
+    steamMarketLowPrice,
+    steamMarketMidPrice,
   },
   priceModifier,
 }) => {
-  const renderedPrice = error ? error : (priceFetched
+  console.log(steamMarketLowPrice, steamMarketMidPrice);
+  const renderedPrices = error ? error : (priceFetched
     ? <React.Fragment>
+        <div className={styles.modal_items__entry_price}>{steamMarketLowPrice}</div>
+        <div className={styles.modal_items__entry_price}>{steamMarketMidPrice}</div>
+
         <input
           type="text"
           pattern="[0-9]+([\.][0-9]{1,})?"
@@ -49,7 +55,7 @@ export const SellModalItem: React.FC<SellModalItemProps> = observer(({
       </div>
       <div className={styles.modal_items__entry_ellipsized}>{marketName}</div>
       <div className={styles.modal_items__entry_inline_flex}>
-        {renderedPrice}
+        {renderedPrices}
       </div>
     </div>
   );

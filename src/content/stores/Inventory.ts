@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx';
-import { isUndefined } from 'lodash';
+import { isUndefined, max } from 'lodash';
 import { getPrice, getIconUrl, sellItem, getInventory, SteamInventory, Description, Asset } from 'content/API';
-import { getOriginalWindow, reflectAll, timeout, DeferredRequests } from 'utils';
+import { getOriginalWindow, reflectAll, DeferredRequests } from 'utils';
 import { Items, ItemConstructorParameter, RootStore, Item } from './';
 
 
@@ -70,7 +70,9 @@ export class Inventory {
       marketHashName,
       marketHashNameEncoded: encodeURIComponent(marketHashName),
       currencyId,
-      steamMarketPrice: '',
+      steamMarketPrice: 0,
+      steamMarketLowPrice: 0,
+      steamMarketMidPrice: 0,
       currency: '',
       marketName,
       iconUrl: getIconUrl(iconUrl),
@@ -85,29 +87,34 @@ export class Inventory {
     const {
       g_strCountryCode: countryCode,
       g_rgWalletInfo: { wallet_currency: currencyId },
-      g_rgCurrencyData,
+      g_rgCurrencyData: rgCurrencyData,
       GetCurrencyCode,
       GetPriceValueAsInt,
     } = pageWindow;
     const { market_hash_name: marketHashName } = await this.getItemDescription(itemId);
     const itemParams = { countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) };
     const { 
-      median_price: midPrice,
-      lowest_price: lowPrice,
+      median_price: medianPrice,
+      lowest_price: lowestPrice,
     } = await this.requests.defer((): Promise<any> => getPrice(itemParams), 2000);
-    const price = isUndefined(midPrice) ? lowPrice : midPrice;
 
-    if ([ midPrice, lowPrice ].every(isUndefined)) {
+    if ([ medianPrice, lowestPrice ].every(isUndefined)) {
       const errorMessage = browser.i18n.getMessage('logger_inventory_price_failed');
       this.rootStore.logger.log(`[X] ${errorMessage}`);
       return Promise.reject(errorMessage);
     }
-  
+
+    const steamMarketLowPrice = GetPriceValueAsInt(lowestPrice) / 100;
+    const steamMarketMidPrice = GetPriceValueAsInt(medianPrice) / 100;
+    const steamMarketPrice = max([ steamMarketLowPrice, steamMarketMidPrice ]);
+
     const currencyCode = GetCurrencyCode(currencyId);
 
     return {
-      steamMarketPrice: String(GetPriceValueAsInt(price) / 100),
-      currency: g_rgCurrencyData[currencyCode].strSymbol || currencyCode,
+      steamMarketLowPrice,
+      steamMarketMidPrice,
+      steamMarketPrice,
+      currency: rgCurrencyData[currencyCode].strSymbol || currencyCode,
     };
   }
 
