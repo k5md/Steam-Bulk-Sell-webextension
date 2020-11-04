@@ -23,12 +23,23 @@ export class Inventory {
     const pageWindow = getOriginalWindow(window);
     const {
       g_strCountryCode: countryCode,
-      g_ActiveInventory: { m_steamid: steamId, m_cItems: itemsCount, m_rgAssets: localAssets },
+      g_ActiveInventory: {
+        m_steamid: steamId,
+        m_cItems: itemsCount,
+        m_rgAssets: localAssets,
+        m_rgChildInventories: childInventories,
+      },
     } = pageWindow;
 
     // NOTE: usually we just take description from global object that is populated by steam
     if (localAssets[assetId] && localAssets[assetId].description) {
       return localAssets[assetId].description;
+    }
+
+    // NOTE: if there are multiple context for appId, steam does not populate 
+    // activeInventory.m_rgAssets, instead it populates m_rgChildInventories[contextId].m_rgAssets
+    if (childInventories[contextId] && childInventories[contextId].m_rgAssets[assetId]) {
+      return childInventories[contextId].m_rgAssets[assetId].description;
     }
     
     // NOTE: but there are cases, when page is ready but assets are not loaded
