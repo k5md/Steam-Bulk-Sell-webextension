@@ -13,6 +13,7 @@ declare namespace IndexScssModule {
     modal_sell__divider: string;
     modal_sell__items: string;
     modal_sell__multiply_number: string;
+    modal_sell__offset_number: string;
     modal_sell__price_modifier: string;
     modal_sell__total: string;
   }

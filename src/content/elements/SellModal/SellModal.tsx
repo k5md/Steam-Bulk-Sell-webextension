@@ -20,6 +20,8 @@ export const SellModal: React.FC<SellModalProps> = observer(({
   setMultiplyModifier,
   priceModifier,
   setPriceModifier,
+  offsetModifier,
+  setOffsetModifier,
   items,
   total,
   fetchedItems,
@@ -43,6 +45,8 @@ export const SellModal: React.FC<SellModalProps> = observer(({
           setMultiplyModifier={setMultiplyModifier}
           priceModifier={priceModifier}
           setPriceModifier={setPriceModifier}
+          offsetModifier={offsetModifier}
+          setOffsetModifier={setOffsetModifier}
           fetchedItems={fetchedItems}
         />
       </div>

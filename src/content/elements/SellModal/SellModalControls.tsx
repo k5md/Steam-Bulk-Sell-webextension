@@ -11,8 +11,10 @@ export type SellModalControlsProps  = {
   clearHandler: (...args: any[]) => void;
   multiplyModifier: number;
   priceModifier: string;
+  offsetModifier: number;
   setPriceModifier: (...args: any[]) => void;
   setMultiplyModifier: (...args: any[]) => void;
+  setOffsetModifier: (...args: any[]) => void;
   fetchedItems: boolean;
 };
 
@@ -24,6 +26,8 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
   setMultiplyModifier,
   priceModifier,
   setPriceModifier,
+  offsetModifier,
+  setOffsetModifier,
   fetchedItems,
 }) => (
   <div className={styles.modal_sell__controls}>   
@@ -54,6 +58,24 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
           onInput={setMultiplyModifier}
           className={styles.modal_sell__multiply_number}
           title={browser.i18n.getMessage('modal_price_modifier_multiply_tooltip')}
+        />
+      </div>
+      <div>
+        <label>{browser.i18n.getMessage('modal_price_modifier_offset')}</label>
+        <input
+          type="radio"
+          name="priceModifier"
+          value="offset"
+          onChange={setPriceModifier}
+          checked={priceModifier === 'offset'}
+        />
+        <input
+          type="text"
+          pattern="-?[0-9]+([\.][0-9]{1,})?"
+          value={offsetModifier}
+          onInput={setOffsetModifier}
+          className={styles.modal_sell__offset_number}
+          title={browser.i18n.getMessage('modal_price_modifier_offset_tooltip')}
         />
       </div>
       <div>

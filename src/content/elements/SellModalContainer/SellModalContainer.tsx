@@ -14,8 +14,10 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
     clear,
     multiplyModifier,
     priceModifier,
+    offsetModifier,
     setPriceModifier,
     setMultiplyModifier,
+    setOffsetModifier,
     total,
   } = useItems();
 
@@ -43,8 +45,10 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
       open={showSellModal}
       multiplyModifier={multiplyModifier}
       priceModifier={priceModifier}
+      offsetModifier={offsetModifier}
       setPriceModifier={(e): void => setPriceModifier(e.target.value)}
       setMultiplyModifier={(e): void => setMultiplyModifier(e.target.value)}
+      setOffsetModifier={(e): void => setOffsetModifier(e.target.value)}
       total={total}
       fetchedItems={selected.every(item => item.priceFetched || item.error)}
     />
