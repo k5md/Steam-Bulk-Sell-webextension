@@ -24,7 +24,6 @@ export const SellModalItem: React.FC<SellModalItemProps> = observer(({
   },
   priceModifier,
 }) => {
-  console.log(steamMarketLowPrice, steamMarketMidPrice);
   const renderedPrices = error ? error : (priceFetched
     ? <React.Fragment>
         <div className={styles.modal_items__entry_price}>{steamMarketLowPrice}</div>
