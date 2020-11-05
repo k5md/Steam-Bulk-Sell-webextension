@@ -65,7 +65,7 @@ To monitor changes in browser with hot-reloading you can do
 
 ## Internationalization
 
-The extension uses [i18n](https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/Internationalization), so if you want to participate in translating the extension texts into your language, please, refer to [messages.json](https://github.com/k5md/Steam-Bulk-Sell-webextension/blob/master/src/_locales/en/messages.json) as an example and either create a pull request or create an issue on github.
+The extension uses [i18n](https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/Internationalization), so if you want to participate in translating the extension texts into your language, please, refer to [messages.json](https://github.com/k5md/Steam-Bulk-Sell-webextension/blob/master/src/assets/_locales/en/messages.json) as an example and either create a pull request or create an issue on github.
 Please, note that only "messages" properties need to be translated, "descriptions" are aimed to help translators.
 
 ## Credits
