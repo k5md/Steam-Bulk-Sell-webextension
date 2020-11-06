@@ -1,9 +1,8 @@
 import { observable, action } from 'mobx';
-import { isUndefined, max } from 'lodash';
+import { isUndefined, max, ceil } from 'lodash';
 import { getPrice, getIconUrl, sellItem, getInventory, SteamInventory, Description, Asset } from 'content/API';
 import { getOriginalWindow, reflectAll, DeferredRequests } from 'utils';
 import { Items, ItemConstructorParameter, RootStore, Item } from './';
-
 
 
 export class Inventory {
@@ -139,7 +138,7 @@ export class Inventory {
     const sellRequests = this.items.selected
       .filter(item => !item.error)
       .map(({ appId, contextId, assetId, price, marketHashName }) => 
-        this.requests.defer((): Promise<any> => sellItem({ appId, contextId, assetId, price: String(price * 100), sessionId })
+        this.requests.defer((): Promise<any> => sellItem({ appId, contextId, assetId, price: String(ceil(price * 100)), sessionId })
           .then((value) => {
             if (!value.success) throw value;
             this.rootStore.logger.log(`[✓] ${marketHashName}, ${price}`);
