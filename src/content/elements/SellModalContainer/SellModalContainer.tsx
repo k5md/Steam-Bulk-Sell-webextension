@@ -19,6 +19,7 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
     setMultiplyModifier,
     setOffsetModifier,
     total,
+    applyPriceModifications,
   } = useItems();
 
   const clearHandler = useCallback((): void => {
@@ -33,6 +34,7 @@ export const SellModalContainer: React.FC<Props> = observer(({ id }) => {
 
   useEffect(() => {
     document.body.style.overflowY = showSellModal ? 'hidden' : 'revert';
+    applyPriceModifications();
   }, [ showSellModal ]);
 
   return (
