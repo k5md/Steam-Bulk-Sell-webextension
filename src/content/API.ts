@@ -100,6 +100,7 @@ export const sellItem = ({
     credentials: 'include',
     body: requestData,
     referrer: window.location.href,
+    referrerPolicy: "no-referrer-when-downgrade",
   };
   
   return fetch(SELL_URL, requestConfig).then(response => response.json());
