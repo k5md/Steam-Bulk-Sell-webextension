@@ -32,7 +32,7 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
 }) => (
   <div className={styles.modal_sell__controls}>   
     <div className={styles.modal_sell__price_modifier}>
-      <div>
+      <div className={styles.modal_sell__price_modifier__option}>
         <label>{browser.i18n.getMessage('modal_price_modifier_median')}</label>
         <input
           type="radio"
@@ -42,7 +42,7 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
           checked={priceModifier === 'median'}
         />
       </div>
-      <div>
+      <div className={styles.modal_sell__price_modifier__option}>
         <label>{browser.i18n.getMessage('modal_price_modifier_multiply')}</label>
         <input
           type="radio"
@@ -60,7 +60,7 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
           title={browser.i18n.getMessage('modal_price_modifier_multiply_tooltip')}
         />
       </div>
-      <div>
+      <div className={styles.modal_sell__price_modifier__option}>
         <label>{browser.i18n.getMessage('modal_price_modifier_offset')}</label>
         <input
           type="radio"
@@ -78,7 +78,7 @@ export const SellModalControls: React.FC<SellModalControlsProps> = observer(({
           title={browser.i18n.getMessage('modal_price_modifier_offset_tooltip')}
         />
       </div>
-      <div>
+      <div className={styles.modal_sell__price_modifier__option}>
         <label>{browser.i18n.getMessage('modal_price_modifier_custom')}</label>
         <input
           type="radio"

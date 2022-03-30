@@ -34,7 +34,7 @@ export const SellModalItem: React.FC<SellModalItemProps> = observer(({
           pattern="[0-9]+([\.][0-9]{1,})?"
           size={8}
           value={price}
-          readOnly={priceModifier !== 'custom'}
+          disabled={priceModifier !== 'custom'}
           onInput={(e: React.ChangeEvent<HTMLInputElement>): void => setPrice(e.target.value)}
           title={browser.i18n.getMessage('modal_price_tooltip')}
         />
