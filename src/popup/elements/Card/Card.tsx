@@ -22,14 +22,14 @@ export const Card: React.FC<Props> = ({
   } = {},
   children,
 }) => (
-  <BootstrapCard className={`card border-primary ${containerStyle}`}>
+  <BootstrapCard className={`card ${containerStyle}`}>
     <Header
       as="h3"
-      className={`card-header font-weight-bold text-center bg-primary ${titleStyle}`}
+      className={`card-header font-weight-bold text-center ${titleStyle}`}
     >
       {title}
     </Header>
-    <Body className={`card-body ${bodyStyle}`}>
+    <Body className={`card-body d-flex flex-column ${bodyStyle}`}>
       {children}
     </Body>
   </BootstrapCard>
