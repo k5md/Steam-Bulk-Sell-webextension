@@ -10,6 +10,9 @@
     "default_title": "Steam Bulk Sell",
     "default_popup": "popup.html"
   },
+  "background": {
+    "scripts": ["./background.js"]
+  },
   "content_scripts": [
     {
       "matches": [
@@ -39,7 +42,8 @@
     "https://steamcommunity.com/profiles/*/inventory",
     "http://steamcommunity.com/profiles/*/inventory",
     "https://steamcommunity.com/id/*/inventory",
-    "http://steamcommunity.com/id/*/inventory"
+    "http://steamcommunity.com/id/*/inventory",
+    "https://steamcommunity.com/market/sellitem/*"
   ],
   "icons": {
     "16": "./icons/16.png",

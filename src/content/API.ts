@@ -1,6 +1,7 @@
+import { SELL_ITEM } from '../background/constants';
+
 export const INVENTORY_URL = 'https://steamcommunity.com/inventory';
 export const PRICE_URL = 'https://steamcommunity.com/market/priceoverview';
-export const SELL_URL = 'https://steamcommunity.com/market/sellitem';
 export const ICON_URL = 'https://steamcommunity-a.akamaihd.net/economy/image';
 
 export type APIRequestParams = {
@@ -76,36 +77,11 @@ export const getPrice = ({
   return fetch(url, requestConfig).then(response => response.json());
 };
 
-// NOTE: nice following naming conventions, use all lowercase in request
-export const sellItem = ({
-  sessionId: sessionid,
-  appId: appid,
-  contextId: contextid,
-  assetId: assetid,
-  amount = '1',
-  price,
-}: Partial<APIRequestParams>): Promise<Record<string, any>> => {
-  const requestData = new FormData();
-  Object.entries({
-    sessionid,
-    appid,
-    contextid,
-    assetid,
-    amount,
-    price,
-  }).forEach(([key, value]) =>  requestData.append(key, value));
-  const requestConfig: RequestInit = {
-    method: 'POST',
-    cache: 'no-cache',
-    mode: 'cors',
-    credentials: 'include',
-    body: requestData,
-    referrer: window.location.href,
-    referrerPolicy: "no-referrer-when-downgrade",
-  };
-  
-  return fetch(SELL_URL, requestConfig).then(response => response.json());
-};
+export const sellItem = (params: Partial<APIRequestParams>): Promise<Record<string, any>> => browser.runtime.sendMessage({
+  ...params,
+  referrer: window.location.href,
+  contentScriptQuery: SELL_ITEM,
+});
 
 export const getIconUrl = (
   relativeIconUrl: string,

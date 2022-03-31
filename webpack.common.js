@@ -13,6 +13,7 @@ module.exports = {
     path: DIST_DIR,
   },
   entry: {
+    background: './src/background/index.ts',
     content: './src/content/index.ts',
     popup: './src/popup/index.tsx',
   },
