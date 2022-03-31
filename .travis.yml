@@ -2,7 +2,7 @@
 
 language: node_js
 node_js: 
-  - stable
+  - 15.14.0
 
 sudo: false
 
