@@ -70,12 +70,16 @@ export class Inventory {
       market_hash_name: marketHashName,
       market_name: marketName,
       icon_url: iconUrl,
+      classid: classId,
+      instanceid: instanceId,
     } = await this.getItemDescription(itemId);
 
     const itemData = {
       itemId,
       appId,
       contextId,
+      classId,
+      instanceId,
       assetId,
       marketHashName,
       marketHashNameEncoded: encodeURIComponent(marketHashName),
@@ -148,7 +152,7 @@ export class Inventory {
             this.rootStore.logger.log(`[X] ${marketHashName}, ${JSON.stringify(reason)}`);
             throw reason;
           })
-        , 2000)
+        , 3000)
       );
 
     this.selling = true;

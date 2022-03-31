@@ -5,6 +5,8 @@ export type ItemConstructorParameter = {
    itemId: string;
    appId: string;
    contextId: string;
+   classId: string;
+   instanceId: string;
    assetId: string;
    marketHashName: string;
    marketHashNameEncoded: string;
@@ -33,6 +35,8 @@ export class Item implements ItemConstructorParameter{
   itemId: string;
   appId: string;
   contextId: string;
+  classId: string;
+  instanceId: string;
   assetId: string;
   marketHashName = '';
   marketHashNameEncoded: string;

@@ -23,6 +23,7 @@ export type Description = {
   icon_url: string;
   appid: string;
   classid: string;
+  instanceid: string;
 }
 
 export type Asset = {
@@ -78,8 +79,8 @@ export const getPrice = ({
 // NOTE: nice following naming conventions, use all lowercase in request
 export const sellItem = ({
   sessionId: sessionid,
-  appId: appid, contextId:
-  contextid,
+  appId: appid,
+  contextId: contextid,
   assetId: assetid,
   amount = '1',
   price,
