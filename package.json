@@ -1,5 +1,9 @@
 {
   "name": "Steam-Bulk-Sell-webextension",
+  "engines": {
+    "npm": "7.7.6",
+    "node": "15.14.0"
+  },
   "scripts": {
     "build-dev": "npx rimraf ./dist && npx webpack --config ./webpack.dev.js",
     "build-prod": "npx rimraf ./dist && npx webpack --config ./webpack.prod.js",
