@@ -17,7 +17,6 @@
     {
       "matches": [
         "*://steamcommunity.com/profiles/*/inventory*",
-        "*://steamcommunity.com/id/*/inventory*",
         "*://steamcommunity.com/market/sellitem/*"
       ],
       "js": [
@@ -32,7 +31,6 @@
   ],
   "permissions": [
     "*://steamcommunity.com/profiles/*/inventory*",
-    "*://steamcommunity.com/id/*/inventory*",
     "*://steamcommunity.com/market/sellitem/*"
   ],
   "icons": {
