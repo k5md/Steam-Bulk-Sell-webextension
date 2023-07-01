@@ -9,8 +9,12 @@ export const Guide: React.FC = () => (
     <div>
       <p>{browser.i18n.getMessage('guide_run_0')}</p>
       <div className={styles.guide__run_links}>
-        <p>{browser.i18n.getMessage('guide_run_link_profile')}</p>
-        <p>{browser.i18n.getMessage('guide_run_link_id')}</p>
+        <a href={browser.i18n.getMessage('guide_run_link_my')}>
+          {browser.i18n.getMessage('guide_run_link_profile')}
+        </a>
+        <a href={browser.i18n.getMessage('guide_run_link_my')}>
+          {browser.i18n.getMessage('guide_run_link_id')}
+        </a>
       </div>
       <p>{browser.i18n.getMessage('guide_run_1')}</p>
     </div>

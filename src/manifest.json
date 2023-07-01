@@ -16,14 +16,9 @@
   "content_scripts": [
     {
       "matches": [
-        "https://steamcommunity.com/profiles/*/inventory/",
-        "http://steamcommunity.com/profiles/*/inventory/",
-        "https://steamcommunity.com/id/*/inventory/",
-        "http://steamcommunity.com/id/*/inventory/",
-        "https://steamcommunity.com/profiles/*/inventory",
-        "http://steamcommunity.com/profiles/*/inventory",
-        "https://steamcommunity.com/id/*/inventory",
-        "http://steamcommunity.com/id/*/inventory"
+        "*://steamcommunity.com/profiles/*/inventory*",
+        "*://steamcommunity.com/id/*/inventory*",
+        "*://steamcommunity.com/market/sellitem/*"
       ],
       "js": [
         "./content.js"
@@ -31,19 +26,14 @@
       "css": [
         "./content.css"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ],
   "permissions": [
-    "https://steamcommunity.com/profiles/*/inventory/*",
-    "http://steamcommunity.com/profiles/*/inventory/*",
-    "https://steamcommunity.com/id/*/inventory/*",
-    "http://steamcommunity.com/id/*/inventory/*",
-    "https://steamcommunity.com/profiles/*/inventory",
-    "http://steamcommunity.com/profiles/*/inventory",
-    "https://steamcommunity.com/id/*/inventory",
-    "http://steamcommunity.com/id/*/inventory",
-    "https://steamcommunity.com/market/sellitem/*"
+    "*://steamcommunity.com/profiles/*/inventory*",
+    "*://steamcommunity.com/id/*/inventory*",
+    "*://steamcommunity.com/market/sellitem/*"
   ],
   "icons": {
     "16": "./icons/16.png",

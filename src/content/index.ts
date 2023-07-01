@@ -10,7 +10,8 @@ class SteamBulkSell {
   ) {}
 
    async init(): Promise<void> {
-    const { g_bMarketAllowed: marketAllowed } = getOriginalWindow(window);
+    const originalWindow =  getOriginalWindow(window);
+    const marketAllowed = 'g_bMarketAllowed' in originalWindow && originalWindow.g_bMarketAllowed
 
     if (!marketAllowed) {
       return;
