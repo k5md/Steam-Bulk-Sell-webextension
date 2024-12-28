@@ -12,6 +12,13 @@ export const Guide: React.FC = () => (
         <a href={browser.i18n.getMessage('guide_run_link_my')}>
           {browser.i18n.getMessage('guide_run_link_profile')}
         </a>
+        <a href={browser.i18n.getMessage('guide_run_link_my')}>
+          {browser.i18n.getMessage('guide_run_link_id')}
+        </a>
+        <a href={browser.i18n.getMessage('guide_run_link_my')}>
+          {browser.i18n.getMessage('guide_run_link_my')}
+        </a>
+        
       </div>
       <p>{browser.i18n.getMessage('guide_run_1')}</p>
     </div>

@@ -16,6 +16,7 @@
   "content_scripts": [
     {
       "matches": [
+        "*://steamcommunity.com/id/*/inventory*",
         "*://steamcommunity.com/profiles/*/inventory*",
         "*://steamcommunity.com/market/sellitem/*"
       ],
@@ -30,6 +31,7 @@
     }
   ],
   "permissions": [
+    "*://steamcommunity.com/id/*/inventory*",
     "*://steamcommunity.com/profiles/*/inventory*",
     "*://steamcommunity.com/market/sellitem/*"
   ],
@@ -44,6 +46,6 @@
   "homepage_url": "https://github.com/k5md/Steam-Bulk-Sell-webextension",
   "manifest_version": 2,
   "name": "Steam Bulk Sell",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "default_locale": "en"
 }
