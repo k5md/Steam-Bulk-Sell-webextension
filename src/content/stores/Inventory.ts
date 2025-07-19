@@ -72,6 +72,7 @@ export class Inventory {
       icon_url: iconUrl,
       classid: classId,
       instanceid: instanceId,
+      market_fee: marketFee,
     } = await this.getItemDescription(itemId);
 
     const itemData = {
@@ -90,6 +91,7 @@ export class Inventory {
       currency: '',
       marketName,
       iconUrl: getIconUrl(iconUrl),
+      steamMarketFee: Number.parseFloat(marketFee),
     };
   
     return itemData;
@@ -100,12 +102,12 @@ export class Inventory {
     const pageWindow = getOriginalWindow(window);
     const {
       g_strCountryCode: countryCode,
-      g_rgWalletInfo: { wallet_currency: currencyId },
+      g_rgWalletInfo: { wallet_currency: currencyId, wallet_publisher_fee_percent_default: publisherFeePercentDefault },
       g_rgCurrencyData: rgCurrencyData,
       GetCurrencyCode,
       GetPriceValueAsInt,
     } = pageWindow;
-    const { market_hash_name: marketHashName } = await this.getItemDescription(itemId);
+    const { market_hash_name: marketHashName, market_fee: marketFee } = await this.getItemDescription(itemId);
     const itemParams = { countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) };
     const { 
       median_price: medianPrice,
@@ -121,6 +123,7 @@ export class Inventory {
     const steamMarketLowPrice = GetPriceValueAsInt(lowestPrice) / 100;
     const steamMarketMidPrice = GetPriceValueAsInt(medianPrice) / 100;
     const steamMarketPrice = max([ steamMarketLowPrice, steamMarketMidPrice ]);
+    const steamMarketFee = (typeof marketFee !== 'undefined' && marketFee !== null) ? marketFee : publisherFeePercentDefault; // NOTE: check from steam's economy_v2.js
 
     const currencyCode = GetCurrencyCode(currencyId);
 
@@ -129,7 +132,16 @@ export class Inventory {
       steamMarketMidPrice,
       steamMarketPrice,
       currency: rgCurrencyData[currencyCode].strSymbol || currencyCode,
+      steamMarketFee,
     };
+  }
+
+  @action.bound calcYouReceivePrice(buyerPaysPrice: number, publisherFee: number): number {
+    const pageWindow = getOriginalWindow(window);
+    const { CalculateFeeAmount } = pageWindow;
+    const buyerPaysPriceCents = ceil(buyerPaysPrice * 100);
+    const feeInfo = CalculateFeeAmount(buyerPaysPriceCents, publisherFee);
+    return (buyerPaysPriceCents - feeInfo.fees) / 100;
   }
 
   @action.bound async sell(): Promise<void> {
@@ -141,11 +153,11 @@ export class Inventory {
     // NOTE: set some timeout on requests, otherwise all of them will 'fail' except for the first one
     const sellRequests = this.items.selected
       .filter(item => !item.error)
-      .map(({ appId, contextId, assetId, price, marketHashName }) => 
-        this.requests.defer((): Promise<any> => sellItem({ appId, contextId, assetId, price: String(ceil(price * 100)), sessionId })
+      .map(({ appId, contextId, assetId, price, youReceivePrice, marketHashName }) =>
+        this.requests.defer((): Promise<any> => sellItem({ appId, contextId, assetId, price: String(ceil(youReceivePrice * 100)), sessionId })
           .then((value) => {
             if (!value.success) throw value;
-            this.rootStore.logger.log(`[✓] ${marketHashName}, ${price}`);
+            this.rootStore.logger.log(`[✓] ${marketHashName}, ${price}/${youReceivePrice}`);
             return value;
           })
           .catch((reason) => {

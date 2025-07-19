@@ -1,11 +1,11 @@
 declare namespace IndexScssModule {
   export interface IIndexScss {
     modal_inner: string;
+    modal_items: string;
     modal_items__empty: string;
-    modal_items__entry: string;
+    modal_items__entry__image: string;
     modal_items__entry_ellipsized: string;
     modal_items__entry_flex: string;
-    modal_items__entry_inline_flex: string;
     modal_items__entry_price: string;
     modal_sell__button: string;
     modal_sell__buttons: string;

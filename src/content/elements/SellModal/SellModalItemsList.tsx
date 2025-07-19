@@ -15,7 +15,21 @@ export const SellModalItemsList: React.FC<SellModalItemsListProps> = observer(({
   total,
   priceModifier,
 }) => {
-  const renderedItems = items.map(item => <SellModalItem item={item} priceModifier={priceModifier}/>);
+  const renderedItems = (
+    <table className={styles.modal_items}>
+      <thead>
+        <tr>
+          <th>{browser.i18n.getMessage('modal_items_card')}</th>
+          <th className={styles.modal_items__entry_ellipsized}>{browser.i18n.getMessage('modal_items_market_name')}</th>
+          <th>{browser.i18n.getMessage('modal_items_low_bp_price')}</th>
+          <th>{browser.i18n.getMessage('modal_items_median_bp_price')}</th>
+          <th>{browser.i18n.getMessage('modal_items_buyer_pays')}</th>
+          <th>{browser.i18n.getMessage('modal_items_you_receive')}</th>
+        </tr>
+      </thead>
+      {items.map(item => <SellModalItem item={item} priceModifier={priceModifier}/>)}
+    </table>
+  );
 
   const emptyItems = (
     <div className={styles.modal_items__empty}>
@@ -26,7 +40,7 @@ export const SellModalItemsList: React.FC<SellModalItemsListProps> = observer(({
   return (
     <React.Fragment>
       <div className={styles.modal_sell__items}>
-        {renderedItems.length ? renderedItems : emptyItems}
+        {items.length ? renderedItems : emptyItems}
       </div>
       <div className={styles.modal_sell__divider}></div>
       <div className={styles.modal_sell__total}>

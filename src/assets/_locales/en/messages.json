@@ -96,6 +96,36 @@
     "description": "Text displayed in modal when no items were selected to be sold"
   },
 
+  "modal_items_card": {
+    "message": "Card",
+    "description": "Displayed in table head for card thumbnails column"
+  },
+
+  "modal_items_market_name": {
+    "message": "Market name",
+    "description": "Displayed in table head for card market name column"
+  },
+
+  "modal_items_low_bp_price": {
+    "message": "Low BP price",
+    "description": "Displayed in table head for low buyer pays price column"
+  },
+
+  "modal_items_median_bp_price": {
+    "message": "Median BP price",
+    "description": "Displayed in table head for median buyer pays price column"
+  },
+
+  "modal_items_buyer_pays": {
+    "message": "Buyer pays",
+    "description": "Displayed in table head for resulting buyer pays price column"
+  },
+
+  "modal_items_you_receive": {
+    "message": "You receive",
+    "description": "Displayed in table head for resulting price that you receive (buyer price minus fees) column"
+  },
+
 
   "guide_purpose": {
     "message": "Selling one card at a time may be very time consuming, this extension enhances Steam web-version inventory to allow mass item selling",

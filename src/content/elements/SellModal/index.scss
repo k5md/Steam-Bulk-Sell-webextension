@@ -3,9 +3,8 @@
 }
 
 .modal_sell__items {
+  flex-grow: 1;
   overflow-y: auto;
-  flex-grow: 9000;
-  order: 1;
 }
 
 .modal_sell__controls {
@@ -59,18 +58,17 @@
   }
 }
 
-.modal_items__entry {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 10px;
-}
-
 .modal_sell__total {
   display: flex;
   justify-content: end;
   padding: 0 10px;
   order: 3;
+}
+
+.modal_items {
+  table-layout: fixed;
+  width: 100%;
+  text-align: center;
 }
 
 .modal_items__empty {
@@ -83,8 +81,8 @@
   display: flex;
 }
 
-.modal_items__entry_inline_flex {
-  display: inline-flex;
+.modal_items__entry__image {
+  max-width: 100%;
 }
 
 .modal_items__entry_ellipsized {

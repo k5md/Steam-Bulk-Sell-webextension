@@ -17,6 +17,7 @@ export type ItemConstructorParameter = {
    currency: string;
    marketName: string;
    iconUrl: string;
+   steamMarketFee: number;
 }
 
 export class Item implements ItemConstructorParameter{
@@ -31,6 +32,7 @@ export class Item implements ItemConstructorParameter{
   @observable steamMarketPrice = 0;
   @observable currency = '';
   @observable error = '';
+  @observable youReceivePrice = 0;
 
   itemId: string;
   appId: string;
@@ -44,6 +46,7 @@ export class Item implements ItemConstructorParameter{
 
   marketName: string;
   iconUrl: string;
+  steamMarketFee: number;
 
   constructor(rootStore: RootStore, itemId: string) {
     const [ appId, contextId, assetId ] = itemId.split('_');
@@ -72,11 +75,13 @@ export class Item implements ItemConstructorParameter{
       steamMarketMidPrice,
       steamMarketPrice,
       currency,
+      steamMarketFee,
     }) => {
       this.steamMarketLowPrice = steamMarketLowPrice;
       this.steamMarketMidPrice = steamMarketMidPrice;
       this.steamMarketPrice = steamMarketPrice;
       this.currency = currency;
+      this.steamMarketFee = steamMarketFee;
       this.priceFetched = true;
       this.setPrice(this.initialPrice);
     }).catch((error) => {
@@ -98,10 +103,14 @@ export class Item implements ItemConstructorParameter{
 
   @action setPrice = (value: string | number): void => {
     const parsed = parseFloat(String(value));
-
     if (Number.isNaN(parsed) || parsed < 0) {
       return;
     }
+    const receive = this.rootStore.inventory.calcYouReceivePrice(parsed, this.steamMarketFee);
+    if (Number.isNaN(receive) || receive <= 0) {
+      return;
+    }
     this._price = parsed;
+    this.youReceivePrice = receive;
   }
 }

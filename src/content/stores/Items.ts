@@ -7,7 +7,7 @@ export class Items {
   constructor(public rootStore: RootStore) {}
 
   @observable items: { [key: string]: Item } = {}
-  @observable _multiplyModifier = 0
+  @observable _multiplyModifier = 1
   @observable _priceModifier = 'median'
   @observable _offsetModifier = -0.01
 
@@ -78,6 +78,6 @@ export class Items {
   }
 
   @computed get total(): number {
-    return floor(this.selected.reduce((acc, cur) => acc + cur.price, 0), 2);
+    return floor(this.selected.reduce((acc, cur) => acc + cur.youReceivePrice, 0), 2);
   }
 }
