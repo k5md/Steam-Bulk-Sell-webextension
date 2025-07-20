@@ -31,6 +31,10 @@
     }
   ],
   "permissions": [
+    "cookies",
+    "contextualIdentities",
+    "webRequest",
+    "webRequestBlocking",
     "*://steamcommunity.com/id/*/inventory*",
     "*://steamcommunity.com/profiles/*/inventory*",
     "*://steamcommunity.com/market/sellitem/*"
