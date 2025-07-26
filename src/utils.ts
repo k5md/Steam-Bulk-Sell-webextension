@@ -90,11 +90,11 @@ const setContextualIdentityCookies = (details) => {
 };
 
 export const withContextualIdentityCookies = async (url: string, requestConfig: RequestInit & { headers?: HeadersInit & { [contextualIdentityCookiesHeader]?: string } }, { sender }, next): Promise<any> => {
-  const hasPermissions = await browser.permissions.contains({ permissions: ['contextualIdentities', 'cookies', 'webRequest', 'webRequestBlocking']});
-  if (hasPermissions && (browser.contextualIdentities !== undefined)) {
+  if (browser.contextualIdentities !== undefined) {
     const cookies = await browser.cookies.getAll({ storeId: sender.tab.cookieStoreId, url: sender.origin });
     const cookiesHeader = cookies.map(({ name, value }) => `${name}=${value}`).join('; ');
-    requestConfig.headers[contextualIdentityCookiesHeader] = cookiesHeader;
+    if (!requestConfig.headers) requestConfig.headers = {};
+    requestConfig.headers._withCorrectContextualIdentityCookies = cookiesHeader;
     requestConfig.credentials = 'omit';
     if (!browser.webRequest.onBeforeSendHeaders.hasListener(setContextualIdentityCookies)) {
       browser.webRequest.onBeforeSendHeaders.addListener(
