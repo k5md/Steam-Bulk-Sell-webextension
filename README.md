@@ -14,7 +14,7 @@ You can either build the extension yourself or download it, then just navigate t
 ## Features
 
 - Requires permissions for Steam inventory pages
-- Permissions for contextualIdentities, cookies and webRequest, and webRequestBlocking are introduced to support [addons that claim they isolate something](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/) - see [this issue](https://github.com/k5md/Steam-Bulk-Sell-webextension/issues/9).
+- Permissions for contextualIdentities, cookies and webRequest, and webRequestBlocking are introduced to support [cookie-isolating (via contextualIdentities) addons](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/) - see [this issue](https://github.com/k5md/Steam-Bulk-Sell-webextension/issues/9).
 - Allows to select whole inventory tab at once
 - Prices are loaded asynchronously - just open sell modal once and the extension will start fetching prices for currently checked items, close modal and continue selecting/deselecting items
 - Prices are fetched from Steam, so expect ~1s delay between requests, ~2s delay for each selling action
