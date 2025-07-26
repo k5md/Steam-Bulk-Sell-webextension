@@ -1,5 +1,5 @@
 install:
-	npm install
+	npm ci
 
 build-dev:
 	npm run build-dev

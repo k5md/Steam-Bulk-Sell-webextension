@@ -13,7 +13,8 @@ You can either build the extension yourself or download it, then just navigate t
 
 ## Features
 
-- Does not require any permissions, except for Steam inventory pages
+- Requires permissions for Steam inventory pages
+- Permissions for contextualIdentities, cookies and webRequest, and webRequestBlocking are introduced to support [addons that claim they isolate something](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/) - see [this issue](https://github.com/k5md/Steam-Bulk-Sell-webextension/issues/9).
 - Allows to select whole inventory tab at once
 - Prices are loaded asynchronously - just open sell modal once and the extension will start fetching prices for currently checked items, close modal and continue selecting/deselecting items
 - Prices are fetched from Steam, so expect ~1s delay between requests, ~2s delay for each selling action
@@ -35,14 +36,9 @@ You can either build the extension yourself or download it, then just navigate t
 
    `make pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
 
-Building has been tested with:
-- Node.js version [11.15.0](https://nodejs.org/download/release/v11.15.0/)
-- npm version 6.9.0
-- Arch Linux (5.1.7 x86-64)
-
 #### Windows
 1. Install [node and npm](https://nodejs.org)
-2. Int the project directory run `npm run install`
+2. In the project directory run `npm ci`
 3. In the project directory run one of these commands:
 
    `npm run build-dev` to build for development
@@ -52,9 +48,9 @@ Building has been tested with:
    `npm run pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
 
 Building has been tested with:
-- Node.js version [11.15.0](https://nodejs.org/download/release/v11.15.0/)
-- npm version 6.7.0
-- Windows 7 SP1
+- Node.js version [15.14.0](https://nodejs.org/download/release/v15.14.0/)
+- npm version 7.7.6
+- Windows 10
 
 For verification and calculating diffs with submitted addon, use Windows configuration. On Linux and MacOS systems diff will likely fail because of line endings difference affecting webpack hash generation. Or use diff with --strip-trailing-cr on .html and .js files.
 
