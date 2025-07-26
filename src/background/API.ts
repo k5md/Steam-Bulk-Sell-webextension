@@ -1,4 +1,4 @@
-import { SELL_ITEM } from "./constants";
+import { withContextualIdentityCookies } from "utils";
 
 export const SELL_URL = 'https://steamcommunity.com/market/sellitem';
 
@@ -17,22 +17,7 @@ export type APIRequestParams = {
   referrer: string;
 }
 
-const setCorrectContextualIdentityCookies = (details) => {
-  const targetHeader = details.requestHeaders.find(({ name }) => name === 'setCorrectContextualIdentityCookies');
-  if (targetHeader) {
-    const requestHeaders = details.requestHeaders
-      .filter((header) => header.name !== 'setCorrectContextualIdentityCookies')
-      .filter((header) => header.name.toLowerCase() !== 'cookie')
-      .concat({
-          name: 'Cookie',
-          value: targetHeader.value,
-      });
-    return { requestHeaders };
-  }
-  return {};
-};
-
-// NOTE: nice following naming conventions, use all lowercase in request
+// NOTE: nice following naming conventions steam, we have to use all lowercase in request
 export const sellItem = async ({
   sessionId,
   appId,
@@ -51,30 +36,6 @@ export const sellItem = async ({
     amount,
     price,
   }).forEach(([key, value]) =>  requestData.append(key, value));
-  if (browser.contextualIdentities !== undefined) {
-    const cookies = await browser.cookies.getAll({ storeId: sender.tab.cookieStoreId, url: sender.origin });
-    const cookiesHeader = cookies.map(({ name, value }) => `${name}=${value}`).join('; ');
-    const requestConfig: RequestInit = {
-      headers: {
-        setCorrectContextualIdentityCookies: cookiesHeader,
-      },
-      method: 'POST',
-      cache: 'no-cache',
-      mode: 'cors',
-      credentials: 'omit',
-      body: requestData,
-      referrer,
-      referrerPolicy: "no-referrer-when-downgrade",
-    };
-    if (!browser.webRequest.onBeforeSendHeaders.hasListener(setCorrectContextualIdentityCookies)) {
-      browser.webRequest.onBeforeSendHeaders.addListener(
-        setCorrectContextualIdentityCookies,
-        { urls: [ SELL_URL ] },
-        ['blocking', 'requestHeaders'],
-      );
-    }
-    return fetch(SELL_URL, requestConfig).then(response => response.json());
-  }
   const requestConfig: RequestInit = {
     method: 'POST',
     cache: 'no-cache',
@@ -84,5 +45,5 @@ export const sellItem = async ({
     referrer,
     referrerPolicy: "no-referrer-when-downgrade",
   };
-  return fetch(SELL_URL, requestConfig).then(response => response.json());
+  return withContextualIdentityCookies(SELL_URL, requestConfig, { sender }, fetch).then(response => response.json());
 };

@@ -73,3 +73,40 @@ export class DeferredRequests {
     return execution;
   }
 }
+
+const contextualIdentityCookiesHeader = '_withCorrectContextualIdentityCookies';
+
+const setContextualIdentityCookies = (details) => {
+  const targetCookie = contextualIdentityCookiesHeader;
+  const targetHeader = details.requestHeaders.find(({ name }) => name === targetCookie);
+  if (targetHeader) {
+    const requestHeaders = details.requestHeaders
+      .filter((header) => header.name !== targetCookie)
+      .filter((header) => header.name.toLowerCase() !== 'cookie')
+      .concat({ name: 'Cookie', value: targetHeader.value });
+    return { requestHeaders };
+  }
+  return {};
+};
+
+export const withContextualIdentityCookies = async (url: string, requestConfig: RequestInit & { headers?: HeadersInit & { [contextualIdentityCookiesHeader]?: string } }, { sender }, next): Promise<any> => {
+  const hasPermissions = await browser.permissions.contains({ permissions: ['contextualIdentities', 'cookies', 'webRequest', 'webRequestBlocking']});
+  if (hasPermissions && (browser.contextualIdentities !== undefined)) {
+    const cookies = await browser.cookies.getAll({ storeId: sender.tab.cookieStoreId, url: sender.origin });
+    const cookiesHeader = cookies.map(({ name, value }) => `${name}=${value}`).join('; ');
+    requestConfig.headers[contextualIdentityCookiesHeader] = cookiesHeader;
+    requestConfig.credentials = 'omit';
+    if (!browser.webRequest.onBeforeSendHeaders.hasListener(setContextualIdentityCookies)) {
+      browser.webRequest.onBeforeSendHeaders.addListener(
+        setContextualIdentityCookies,
+        { urls: [ url ] },
+        ['blocking', 'requestHeaders'],
+      );
+    }
+  } else {
+    if (browser.webRequest.onBeforeSendHeaders.hasListener(setContextualIdentityCookies)) {
+      browser.webRequest.onBeforeSendHeaders.removeListener(setContextualIdentityCookies);
+    }
+  }
+  return next(url, requestConfig);
+}
