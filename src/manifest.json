@@ -50,6 +50,6 @@
   "homepage_url": "https://github.com/k5md/Steam-Bulk-Sell-webextension",
   "manifest_version": 2,
   "name": "Steam Bulk Sell",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "default_locale": "en"
 }
