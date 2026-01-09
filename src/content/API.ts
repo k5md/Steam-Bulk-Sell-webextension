@@ -25,7 +25,6 @@ export type Description = {
   appid: string;
   classid: string;
   instanceid: string;
-  market_fee?: string;
 }
 
 export type Asset = {

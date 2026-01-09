@@ -4,7 +4,6 @@ import { getPrice, getIconUrl, sellItem, getInventory, SteamInventory, Descripti
 import { getOriginalWindow, reflectAll, DeferredRequests } from 'utils';
 import { Items, ItemConstructorParameter, RootStore, Item } from './';
 
-
 export class Inventory {
   @observable items: Items;
   @observable showSellModal = false;
@@ -72,7 +71,6 @@ export class Inventory {
       icon_url: iconUrl,
       classid: classId,
       instanceid: instanceId,
-      market_fee: marketFee,
     } = await this.getItemDescription(itemId);
 
     const itemData = {
@@ -91,7 +89,6 @@ export class Inventory {
       currency: '',
       marketName,
       iconUrl: getIconUrl(iconUrl),
-      steamMarketFee: Number.parseFloat(marketFee),
     };
   
     return itemData;
@@ -102,12 +99,11 @@ export class Inventory {
     const pageWindow = getOriginalWindow(window);
     const {
       g_strCountryCode: countryCode,
-      g_rgWalletInfo: { wallet_currency: currencyId, wallet_publisher_fee_percent_default: publisherFeePercentDefault },
+      g_rgWalletInfo: { wallet_currency: currencyId },
       g_rgCurrencyData: rgCurrencyData,
       GetCurrencyCode,
-      GetPriceValueAsInt,
     } = pageWindow;
-    const { market_hash_name: marketHashName, market_fee: marketFee } = await this.getItemDescription(itemId);
+    const { market_hash_name: marketHashName } = await this.getItemDescription(itemId);
     const itemParams = { countryCode, currencyId, appId, marketHashName: encodeURIComponent(marketHashName) };
     const { 
       median_price: medianPrice,
@@ -120,10 +116,9 @@ export class Inventory {
       return Promise.reject(errorMessage);
     }
 
-    const steamMarketLowPrice = GetPriceValueAsInt(lowestPrice) / 100;
-    const steamMarketMidPrice = GetPriceValueAsInt(medianPrice) / 100;
+    const steamMarketLowPrice = this.fromCents(this.parsePrice(lowestPrice));
+    const steamMarketMidPrice = this.fromCents(this.parsePrice(medianPrice));
     const steamMarketPrice = max([ steamMarketLowPrice, steamMarketMidPrice ]);
-    const steamMarketFee = (typeof marketFee !== 'undefined' && marketFee !== null) ? marketFee : publisherFeePercentDefault; // NOTE: check from steam's economy_v2.js
 
     const currencyCode = GetCurrencyCode(currencyId);
 
@@ -132,16 +127,23 @@ export class Inventory {
       steamMarketMidPrice,
       steamMarketPrice,
       currency: rgCurrencyData[currencyCode].strSymbol || currencyCode,
-      steamMarketFee,
     };
   }
 
-  @action.bound calcYouReceivePrice(buyerPaysPrice: number, publisherFee: number): number {
+  @action.bound parsePrice(price: string): number {
     const pageWindow = getOriginalWindow(window);
-    const { CalculateFeeAmount } = pageWindow;
-    const buyerPaysPriceCents = ceil(buyerPaysPrice * 100);
-    const feeInfo = CalculateFeeAmount(buyerPaysPriceCents, publisherFee);
-    return (buyerPaysPriceCents - feeInfo.fees) / 100;
+    const { GetPriceValueAsInt } = pageWindow;
+    return GetPriceValueAsInt(price);
+  }
+
+  @action.bound fromCents(price: number): number {
+    return Number((price / 100).toFixed(2)); // as in steam's global.js v_currencyformat line 332
+  }
+
+  @action.bound calcYouReceivePrice(buyerPaysPriceCents: number): number {
+    const pageWindow = getOriginalWindow(window);
+    const { GetItemPriceFromTotal, g_rgWalletInfo: rgWalletInfo } = pageWindow;
+    return GetItemPriceFromTotal(buyerPaysPriceCents, rgWalletInfo);
   }
 
   @action.bound async sell(): Promise<void> {
